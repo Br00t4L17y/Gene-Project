@@ -8,14 +8,21 @@ import java.util.Scanner;
 public class GeneBankCreateBTree {
 	public static void main(String args[]) {
 
+		String nucleotideSequence = BuildStringFromFile(args[2]);
+
+		System.out.println(nucleotideSequence);
+	}
+
+	private static String BuildStringFromFile(String fileName) {
 		String headTag = "ORIGIN";
 		String tailTag = "//";
 		boolean found = false;
 
 		Path relativePath = Paths.get("");
-		String filePath = relativePath.toAbsolutePath().toString() + args[0];
+		String filePath = relativePath.toAbsolutePath().toString() + fileName;
+		StringBuilder builder = new StringBuilder();
+
 		try {
-			StringBuilder builder = new StringBuilder();
 			Scanner reader = new Scanner(new FileReader(filePath));
 			while(reader.hasNextLine()) {
 				String line = reader.nextLine();
@@ -34,11 +41,11 @@ public class GeneBankCreateBTree {
 				}
 			}
 
-			System.out.println(builder);
 			reader.close();
 		} catch (IOException exception) {
 			exception.printStackTrace();
 		}
 
+		return builder.toString();
 	}
 }
