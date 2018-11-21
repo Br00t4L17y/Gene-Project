@@ -1,5 +1,9 @@
 public class BTree {
 	List<BTreeNode> nodes;
+
+	public BTree(){
+		
+	}
 }
 
 public class BTreeNode {
