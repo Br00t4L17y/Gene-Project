@@ -2,7 +2,7 @@ public class BTree {
 	List<BTreeNode> nodes;
 
 	public BTree(){
-		
+
 	}
 }
 
@@ -11,6 +11,10 @@ public class BTreeNode {
 	boolean leaf;
 	List<TreeObject> values;
 	List<BTreeNode> children;
+
+	public BTreeNode(){
+
+	}
 
 
 }
