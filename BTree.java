@@ -1,6 +1,10 @@
 public class BTree {
-<<<<<<< HEAD
     int t; // minimum degree 
+    List<BTreeNode> nodes;
+
+	public BTree(){
+
+	}
 
     // NOTE: I'm assuming that keys (from BTreeNode) is an arrayList
     // Also I'm interacting directly with the keys arrayLists, which eventually we may want to 
@@ -43,12 +47,6 @@ public class BTree {
             newRightNode.parent = newParent; 
         }
     }
-=======
-	List<BTreeNode> nodes;
-
-	public BTree(){
-
-	}
 }
 
 public class BTreeNode {
@@ -62,5 +60,4 @@ public class BTreeNode {
 	}
 
 
->>>>>>> bf036776b66c042caab9a0dfc34aea35671a49f1
 }
