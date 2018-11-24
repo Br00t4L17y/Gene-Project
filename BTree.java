@@ -1,4 +1,5 @@
 public class BTree {
+<<<<<<< HEAD
     int t; // minimum degree 
 
     // NOTE: I'm assuming that keys (from BTreeNode) is an arrayList
@@ -42,4 +43,24 @@ public class BTree {
             newRightNode.parent = newParent; 
         }
     }
+=======
+	List<BTreeNode> nodes;
+
+	public BTree(){
+
+	}
+}
+
+public class BTreeNode {
+	int numberOfKeys;
+	boolean leaf;
+	List<TreeObject> values;
+	List<BTreeNode> children;
+
+	public BTreeNode(){
+
+	}
+
+
+>>>>>>> bf036776b66c042caab9a0dfc34aea35671a49f1
 }
