@@ -28,7 +28,7 @@ public class BTree {
             int index = 0; 
             // Find correct spot for the object in the parent node and add it there 
             while (index < node.parent.keys.size()) {
-                if (node.parent.keys[index] > middleObject || index == node.parent.keys.size()) { // TODO: will we be able to compare the keys like this? 
+                if (node.parent.keys[index].compareTo(middleObject) == 1 || index == node.parent.keys.size()) {  
                     node.parent.keys.add(index, middleObject); 
                     node.parent.children.add(index+1, newRightNode); 
                     newRightNode.parent = node.parent; 
@@ -56,7 +56,7 @@ public class BTree {
     	// if BTree is empty
     	if(nodes.size() == 0) {
     		root = new BTreeNode(true, t);
-    		root.values[0] = element;
+    		root.values.set(0, element);
     		root.numberOfKeys++;
     	}
     	
@@ -66,7 +66,7 @@ public class BTree {
         	if(root.getNumberOfKeys() == 2*(t-1)) {
         		BTreeNode s = new BTreeNode(false, t); // make a new node
         		s.numberOfKeys = 0;
-        		s.children[0] = root;
+        		s.children.set(0, root); 
         		split(s);
         		insertNonFull(s, element); 	
         		root = s;
@@ -89,29 +89,29 @@ public class BTree {
     	int i = node.numberOfKeys;
     	// if node is a leaf then we can insert //TODO: need to create a compare to or figure out another way to compare
     	if(node.leaf) {
-    		while(i <= 0 && element.compareTo(node.values[i]) < 0) {
-        		node.values[i+1] = node.values[i]; // shifts over elements
+    		while(i <= 0 && element.compareTo(node.values.get(i)) < 0) {
+        		node.values.set(i+1, node.values.get(i)); // shifts over elements
         		i--;
         	}
-    		node.values[i+1] = element;
+    		node.values.set(i+1, element);
     		node.numberOfKeys++;
     	}
     	
     	// if node is not a leaf then we cannot insert and we need to determine the correct child to descend the tree
     	else {
-    		while(i >= 1 && element.compareTo(node.values[i]) < 0) {
+    		while(i >= 1 && element.compareTo(node.values.get(i)) < 0) {
     			i--;
     		}
     		i = i+1;
     		
     		// if child is full
-    		if(node.children[i].numberOfKeys == 2*(t-1)) { 
+    		if(node.children.get(i).numberOfKeys == 2*(t-1)) { 
     			split(node); // split in the book uses index i
-    			if(element.compareTo(node.children[i]) > 0)
+    			if(element.compareTo(node.children.get(i)) > 0)
     				i++;
     		}
     		
-    	insertNonFull(node.children[i], element);
+    	insertNonFull(node.children.get(i), element);
     	
     	}
     	
@@ -122,9 +122,10 @@ public class BTree {
 public class BTreeNode {
 	int numberOfKeys; // represents the number of key elements sorted in a node
 	boolean leaf;
-	TreeObject[] values;
-	//List<BTreeNode> children;
-	BTreeNode[] children;
+	//TreeObject[] values;
+	ArrayList<BTreeNode> children;
+    //BTreeNode[] children;
+    ArrayList<TreeObject> values; 
 	
 	public BTreeNode(boolean isLeaf, int t){
 		leaf = isLeaf;
