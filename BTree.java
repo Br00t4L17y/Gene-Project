@@ -3,16 +3,18 @@ import java.util.List;
 public class BTree {
     int t; // minimum degree 
     BTreeNode root;
-    List<BTreeNode> nodes;
+    ArrayList<BTreeNode> nodes;
 
-	public BTree(){
-
+	public BTree(int degree){
+		t = degree;
+		nodes = new ArrayList<BTreeNode>();
+		root = null;
 	}
 
     // NOTE: I'm assuming that keys (from BTreeNode) is an arrayList
     // Also I'm interacting directly with the keys arrayLists, which eventually we may want to 
     // want to wrap in methods within the BTreeNode object instead 
-    private void split(BTreeNode node) {
+    /*private void split(BTreeNode node) {
 
         // Take all keys to the right of the middle and add them to a new node 
         BTreeNode newRightNode = new BTreeNode(); // TODO: add necessary constructor parameters
@@ -49,8 +51,32 @@ public class BTree {
             node.parent = newParent; 
             newRightNode.parent = newParent; 
         }
-    }
-    
+	}*/
+	
+    private void split(BTreeNode node, int i) {
+		BTreeNode rightNode = new BTreeNode(true, t);
+		BTreeNode leftNode = node.children.get(i); 
+		rightNode.leaf = leftNode.leaf; 
+		//rightNode.keys.size() = t-1; 
+		for (int j = 1; j < t - 1; j++) {
+			leftNode.set(j+t, rightNode.keys.get(j)); 
+		}
+		if (!leftNode.leaf) {
+			for (int j = 1; j < t; j++) {
+				rightNode.children.set(j, leftNode.children.get(j+t)); 
+			}
+		}
+		//leftNode.keys.size() = t - 1
+		for (int j = node.size() + 1; j > i + 1; j--) {
+			node.children.set(j+1, node.children.get(j)); 
+		}
+		node.children.set(i+1, rightNode);
+		for (int j = node.size(); j > i; j--) {
+			node.keys.set(j+1, node.keys.get(j)); 
+		} 
+		node.keys.set(i, leftNode.keys.get(t)); 
+		// set node length += 1 
+	} 
     
     public void add(TreeObject element) {
     	// if BTree is empty
@@ -67,7 +93,7 @@ public class BTree {
         		BTreeNode s = new BTreeNode(false, t); // make a new node
         		s.numberOfKeys = 0;
         		s.children.set(0, root); 
-        		split(s);
+        		split(s, i);
         		insertNonFull(s, element); 	
         		root = s;
         	}
@@ -106,7 +132,7 @@ public class BTree {
     		
     		// if child is full
     		if(node.children.get(i).numberOfKeys == 2*(t-1)) { 
-    			split(node); // split in the book uses index i
+    			split(node, i); // split in the book uses index i
     			if(element.compareTo(node.children.get(i)) > 0)
     				i++;
     		}
@@ -117,28 +143,38 @@ public class BTree {
     	
     }
     
-}
 
-public class BTreeNode {
-	int numberOfKeys; // represents the number of key elements sorted in a node
-	boolean leaf;
-	//TreeObject[] values;
-	ArrayList<BTreeNode> children;
-    //BTreeNode[] children;
-    ArrayList<TreeObject> values; 
-	
-	public BTreeNode(boolean isLeaf, int t){
-		leaf = isLeaf;
-		numberOfKeys = 0;
-		// need to also declare lists here? Should we use list, arrayList, or arrays??
-		values = new TreeObject[2*t-1]; 
-	    children = new BTreeNode [2*t]; 
+
+	public class BTreeNode {
+		int minKeys; // represents the number of key elements sorted in a node
+		int maxKeys;
+		boolean leaf;
+		ArrayList<BTreeNode> children;
+		ArrayList<TreeObject> values; 
+		
+		public BTreeNode() {
+			minKeys = (BTree.this.t - 1);
+			maxKeys = ((2 * BTree.this.t) - 1);
+			values = new ArrayList<TreeObjects>(2*BTree.this.t - 1);
+			children = new ArrayList<BTreeNode>(2*BTree.this.t);
+			leaf = true;
+		}
+
+		public BTreeNode(boolean isLeaf, int t){
+			leaf = isLeaf;
+			minKeys = (t - 1);
+			maxKeys = ((2 * t) - 1);
+			// need to also declare lists here? Should we use list, arrayList, or arrays??
+			values = new ArrayList<TreeObjects>(2*t-1);
+			children = new ArrayList<BTreeNode>(2*t);
+		}
+		
+		/*
+		* returns the number of key elements stored in a node
+		*/
+		public int getNumberOfKeys() {
+			return numberOfKeys;
+		}
 	}
-	
-	/*
-	 * returns the number of key elements stored in a node
-	 */
-	public int getNumberOfKeys() {
-		return numberOfKeys;
-	}
+
 }

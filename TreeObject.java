@@ -22,4 +22,12 @@ public class TreeObject {
 		key = Long.parseLong(binaryVal);
 
 	}
+
+	public Long getKey(){
+		return this.key;
+	}
+
+	public boolean compareTo(TreeObject object){
+		return this.key == object.getKey();
+	}
 }

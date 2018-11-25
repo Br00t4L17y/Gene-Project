@@ -7,8 +7,16 @@ import java.util.Scanner;
 
 public class GeneBankCreateBTree {
 	public static void main(String args[]) {
+		BTree tree = new BTree(args[1]);
 
 		String nucleotideSequence = BuildStringFromFile(args[2]);
+
+
+
+		
+		// for (int i = 0; i < builder.length(); i++) {
+			
+		// };
 
 		System.out.println(nucleotideSequence);
 	}
