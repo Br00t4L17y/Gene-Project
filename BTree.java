@@ -1,5 +1,8 @@
+import java.util.List;
+
 public class BTree {
     int t; // minimum degree 
+    BTreeNode root;
     List<BTreeNode> nodes;
 
 	public BTree(){
@@ -47,17 +50,94 @@ public class BTree {
             newRightNode.parent = newParent; 
         }
     }
+    
+    
+    public void add(TreeObject element) {
+    	// if BTree is empty
+    	if(nodes.size() == 0) {
+    		root = new BTreeNode(true, t);
+    		root.values[0] = element;
+    		root.numberOfKeys++;
+    	}
+    	
+    	// BTree is not empty
+    	else {
+    		// if root is full --> need to create new node and
+        	if(root.getNumberOfKeys() == 2*(t-1)) {
+        		BTreeNode s = new BTreeNode(false, t); // make a new node
+        		s.numberOfKeys = 0;
+        		s.children[0] = root;
+        		split(s);
+        		insertNonFull(s, element); 	
+        		root = s;
+        	}
+        	// if root is not full
+        	else {
+        		insertNonFull(root, element);
+        	}
+    	}
+    	
+    	
+    }
+    
+    /**
+     * Inserting helper method, although this method does the real job of locating the place to insert and inserting. 
+     * @param node
+     * @param element
+     */
+    private void insertNonFull(BTreeNode node, TreeObject element) {
+    	int i = node.numberOfKeys;
+    	// if node is a leaf then we can insert //TODO: need to create a compare to or figure out another way to compare
+    	if(node.leaf) {
+    		while(i <= 0 && element.compareTo(node.values[i]) < 0) {
+        		node.values[i+1] = node.values[i]; // shifts over elements
+        		i--;
+        	}
+    		node.values[i+1] = element;
+    		node.numberOfKeys++;
+    	}
+    	
+    	// if node is not a leaf then we cannot insert and we need to determine the correct child to descend the tree
+    	else {
+    		while(i >= 1 && element.compareTo(node.values[i]) < 0) {
+    			i--;
+    		}
+    		i = i+1;
+    		
+    		// if child is full
+    		if(node.children[i].numberOfKeys == 2*(t-1)) { 
+    			split(node); // split in the book uses index i
+    			if(element.compareTo(node.children[i]) > 0)
+    				i++;
+    		}
+    		
+    	insertNonFull(node.children[i], element);
+    	
+    	}
+    	
+    }
+    
 }
 
 public class BTreeNode {
-	int numberOfKeys;
+	int numberOfKeys; // represents the number of key elements sorted in a node
 	boolean leaf;
-	List<TreeObject> values;
-	List<BTreeNode> children;
-
-	public BTreeNode(){
-
+	TreeObject[] values;
+	//List<BTreeNode> children;
+	BTreeNode[] children;
+	
+	public BTreeNode(boolean isLeaf, int t){
+		leaf = isLeaf;
+		numberOfKeys = 0;
+		// need to also declare lists here? Should we use list, arrayList, or arrays??
+		values = new TreeObject[2*t-1]; 
+	    children = new BTreeNode [2*t]; 
 	}
-
-
+	
+	/*
+	 * returns the number of key elements stored in a node
+	 */
+	public int getNumberOfKeys() {
+		return numberOfKeys;
+	}
 }
