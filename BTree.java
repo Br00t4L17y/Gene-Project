@@ -57,25 +57,22 @@ public class BTree {
 		BTreeNode rightNode = new BTreeNode(true, t);
 		BTreeNode leftNode = node.children.get(i); 
 		rightNode.leaf = leftNode.leaf; 
-		//rightNode.keys.size() = t-1; 
-		for (int j = 1; j < t - 1; j++) {
-			leftNode.set(j+t, rightNode.keys.get(j)); 
+		for (int j = 1; j < t; j++) {
+			rightNode.set(j, leftNode.keys.get(j+t)); 
 		}
 		if (!leftNode.leaf) {
-			for (int j = 1; j < t; j++) {
+			for (int j = 1; j <= t; j++) {
 				rightNode.children.set(j, leftNode.children.get(j+t)); 
 			}
 		}
-		//leftNode.keys.size() = t - 1
-		for (int j = node.size() + 1; j > i + 1; j--) {
+		for (int j = node.size() + 1; j > i; j--) {
 			node.children.set(j+1, node.children.get(j)); 
 		}
 		node.children.set(i+1, rightNode);
-		for (int j = node.size(); j > i; j--) {
+		for (int j = node.size(); j >= i; j--) {
 			node.keys.set(j+1, node.keys.get(j)); 
 		} 
 		node.keys.set(i, leftNode.keys.get(t)); 
-		// set node length += 1 
 	} 
     
     public void add(TreeObject element) {
