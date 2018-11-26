@@ -4,31 +4,48 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.List;
+import java.util.ArrayList;
+import java.lang.Enum;
 
 public class GeneBankCreateBTree {
-	public static void main(String args[]) {
-		BTree tree = new BTree(args[1]);
 
-		String nucleotideSequence = BuildStringFromFile(args[2]);
-
-
-
-		
-		// for (int i = 0; i < builder.length(); i++) {
-			
-		// };
-
-		System.out.println(nucleotideSequence);
+	enum Nucleotide {
+		A,
+		C,
+		G,
+		T;
 	}
 
-	private static String BuildStringFromFile(String fileName) {
+	public static void main(String args[]) {
+		BTree tree = new BTree(Integer.parseInt(args[2]));
+
+		List<String> nucleotideSequences = BuildStringFromFile(args[2]);
+		
+		for (int i = 0; i < nucleotideSequences.size(); i++) {
+			String sequence = nucleotideSequences.get(i);
+			int seqLength = Integer.parseInt(args[3]);
+
+			if (sequence.length() >= seqLength) {
+				int iterations = sequence.length() - seqLength + 1;
+				for (int j = 0; j < iterations; j++) {
+					System.out.println(sequence.substring(j, seqLength + j));
+					// TreeObject treeObject = new TreeObject(sequence.substring(j, seqLength + j));
+					// tree.add(treeObject);
+				}
+			}
+		};
+
+	}
+
+	private static List<String> BuildStringFromFile(String fileName) {
 		String headTag = "ORIGIN";
 		String tailTag = "//";
 		boolean found = false;
 
 		Path relativePath = Paths.get("");
 		String filePath = relativePath.toAbsolutePath().toString() + fileName;
-		StringBuilder builder = new StringBuilder();
+		StringBuilder sequenceBuilder = new StringBuilder();
 
 		try {
 			Scanner reader = new Scanner(new FileReader(filePath));
@@ -45,7 +62,7 @@ public class GeneBankCreateBTree {
 				else {
 					line = line.replaceAll(" ", "");
 					line = line.replaceAll("\\d", "");
-					builder.append(line);
+					sequenceBuilder.append(line.toUpperCase());
 				}
 			}
 
@@ -54,6 +71,24 @@ public class GeneBankCreateBTree {
 			exception.printStackTrace();
 		}
 
-		return builder.toString();
+		List<String> sequenceList = new ArrayList<String>();
+		int lastIndex = 0;
+
+
+		for (int i = 0; i < sequenceBuilder.length(); i++) {
+			String character = sequenceBuilder.substring(i, i + 1);
+			try {
+				Nucleotide.valueOf(character);
+			} 
+			catch (IllegalArgumentException e) {
+				if (lastIndex != i) {
+					sequenceList.add(sequenceBuilder.substring(lastIndex, i));				
+				}
+				lastIndex = i + 1;
+			}			
+		}
+		sequenceList.add(sequenceBuilder.substring(lastIndex, sequenceBuilder.length()));
+
+		return sequenceList;
 	}
 }
