@@ -27,7 +27,13 @@ public class TreeObject {
 		return this.key;
 	}
 
-	public boolean compareTo(TreeObject object){
-		return this.key == object.getKey();
+	public int compareTo(TreeObject object){
+		if (object.getKey() < this.key) {
+			return -1;
+		}
+		else if(object.getKey() == this.key) {
+			return 0;
+		}
+		return 1;
 	}
 }

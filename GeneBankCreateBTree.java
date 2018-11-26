@@ -18,7 +18,7 @@ public class GeneBankCreateBTree {
 	}
 
 	public static void main(String args[]) {
-		//BTree tree = new BTree(Integer.parseInt(args[2]));
+		BTree tree = new BTree(Integer.parseInt(args[1]));
 
 		List<String> nucleotideSequences = BuildStringFromFile(args[2]);
 		
@@ -30,8 +30,8 @@ public class GeneBankCreateBTree {
 				int iterations = sequence.length() - seqLength + 1;
 				for (int j = 0; j < iterations; j++) {
 					System.out.println(sequence.substring(j, seqLength + j));
-					// TreeObject treeObject = new TreeObject(sequence.substring(j, seqLength + j));
-					// tree.add(treeObject);
+					TreeObject treeObject = new TreeObject(sequence.substring(j, seqLength + j));
+					tree.add(treeObject);
 				}
 			}
 		};
