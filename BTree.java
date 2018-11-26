@@ -89,7 +89,7 @@ public class BTree {
     	// BTree is not empty
     	else {
     		// if root is full --> need to create new node and
-        	if(root.getNumberOfKeys() == 2*(t-1)) {
+        	if(root.getNumberOfKeys() == 2*t-1) {
         		BTreeNode s = new BTreeNode(false, t); // make a new node
         		s.numberOfKeys = 0;
         		s.children.set(0, root); 
@@ -131,7 +131,7 @@ public class BTree {
     		i = i+1;
     		
     		// if child is full
-    		if(node.children.get(i).numberOfKeys == 2*(t-1)) { 
+    		if(node.children.get(i).numberOfKeys == 2*t-1) { 
     			split(node, i); // split in the book uses index i
     			if(element.compareTo(node.children.get(i)) > 0)
     				i++;

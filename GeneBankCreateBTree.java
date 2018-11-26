@@ -18,7 +18,7 @@ public class GeneBankCreateBTree {
 	}
 
 	public static void main(String args[]) {
-		BTree tree = new BTree(Integer.parseInt(args[2]));
+		//BTree tree = new BTree(Integer.parseInt(args[2]));
 
 		List<String> nucleotideSequences = BuildStringFromFile(args[2]);
 		
