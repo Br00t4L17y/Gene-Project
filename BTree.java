@@ -53,26 +53,36 @@ public class BTree {
         }
 	}*/
 	
-    private void split(BTreeNode node, int i) {
+    private void split(BTreeNode parent, int i) {
+		// create new right node and get reference to the node to be split 
 		BTreeNode rightNode = new BTreeNode(true, t);
-		BTreeNode leftNode = node.children.get(i); 
+		BTreeNode leftNode = parent.children.get(i); 
 		rightNode.leaf = leftNode.leaf; 
-		for (int j = 1; j < t; j++) {
-			rightNode.set(j, leftNode.keys.get(j+t)); 
+
+		// Move elements into the right node 
+		for (int j = 0; j < t - 1; j++) {
+			rightNode.set(j, leftNode.keys.remove(j+t)); 
 		}
+		// Move children from the left node to the right node if necessary 
 		if (!leftNode.leaf) {
-			for (int j = 1; j <= t; j++) {
-				rightNode.children.set(j, leftNode.children.get(j+t)); 
+			for (int j = 0; j < t; j++) {
+				rightNode.children.set(j, leftNode.children.remove((j-1)+t)); 
 			}
 		}
-		for (int j = node.size() + 1; j > i; j--) {
-			node.children.set(j+1, node.children.get(j)); 
+
+		// Shift parent node's children to make space for new child 
+		for (int j = parent.size(); j > i; j--) {
+			parent.children.set(j+1, parent.children.get(j)); 
 		}
-		node.children.set(i+1, rightNode);
-		for (int j = node.size(); j >= i; j--) {
-			node.keys.set(j+1, node.keys.get(j)); 
+		// Set new right node to be a child 
+		parent.children.set(i+1, rightNode);
+
+		// Shift parent keys to make space for new element 
+		for (int j = parent.size() - 1; j >= i; j--) {
+			parent.keys.set(j+1, parent.keys.get(j)); 
 		} 
-		node.keys.set(i, leftNode.keys.get(t)); 
+		// Pull new element up from the left node 
+		parent.keys.set(i, leftNode.keys.remove(t - 1)); 
 	} 
     
     public void add(TreeObject element) {
