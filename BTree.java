@@ -62,28 +62,28 @@ public class BTree {
 
 		// Move elements into the right node 
 		for (int j = 0; j < t - 1; j++) {
-			rightNode.values.set(j, leftNode.values.remove(j+t)); 
+			rightNode.values.add(j, leftNode.values.remove(j+t)); 
 		}
 		// Move children from the left node to the right node if necessary 
 		if (!leftNode.leaf) {
 			for (int j = 0; j < t; j++) {
-				rightNode.children.set(j, leftNode.children.remove((j-1)+t)); 
+				rightNode.children.add(j, leftNode.children.remove(j+t)); 
 			}
 		}
 
 		// Shift parent node's children to make space for new child 
-		for (int j = parent.children.size(); j > i; j--) {
+		/*for (int j = parent.children.size(); j > i; j--) {
 			parent.children.set(j+1, parent.children.get(j)); 
-		}
+		}*/
 		// Set new right node to be a child 
-		parent.children.set(i+1, rightNode);
+		parent.children.add(i+1, rightNode);
 
 		// Shift parent values to make space for new element 
-		for (int j = parent.values.size() - 1; j >= i; j--) {
+		/*for (int j = parent.values.size() - 1; j >= i; j--) {
 			parent.values.set(j+1, parent.values.get(j)); 
-		} 
+		} */
 		// Pull new element up from the left node 
-		parent.values.set(i, leftNode.values.remove(t - 1)); 
+		parent.values.add(i, leftNode.values.remove(t - 1)); 
 	} 
     
     public void add(TreeObject element) {
@@ -96,7 +96,7 @@ public class BTree {
     	// BTree is not empty
     	else {
     		// if root is full --> need to create new node and
-        	if(root.values.size() == 2*t-1) {
+        	if(root.isFull()) {
         		BTreeNode s = new BTreeNode(false, t); // make a new node
         		s.children.set(0, root); 
         		split(s, 0); //Should this be 0?
@@ -118,25 +118,23 @@ public class BTree {
      * @param element
      */
     private void insertNonFull(BTreeNode node, TreeObject element) {
-    	int i = node.values.size();
-    	// if node is a leaf then we can insert //TODO: need to create a compare to or figure out another way to compare
+    	int i = node.values.size() - 1; // the last key in values
+    	
+    	// Determine correct index to insert at 
+    	while(i >= 0 && element.compareTo(node.values.get(i)) < 0) {
+			i--;
+		}
+    	i++; 
+    	
+    	// if node is a leaf then we can insert 
     	if(node.leaf) {
-    		while(i <= 0 && element.compareTo(node.values.get(i)) < 0) {
-        		node.values.set(i+1, node.values.get(i)); // shifts over elements
-        		i--;
-        	}
-    		node.values.set(i+1, element);
+    		node.values.add(i, element);
     	}
     	
     	// if node is not a leaf then we cannot insert and we need to determine the correct child to descend the tree
-    	else {
-    		while(i >= 1 && element.compareTo(node.values.get(i)) < 0) {
-    			i--;
-    		}
-    		i = i+1;
-    		
+    	else {    		
     		// if child is full
-    		if(node.children.get(i).values.size() == 2*t-1) { 
+    		if(node.children.get(i).isFull()) { 
     			split(node, i); // split in the book uses index i
     			if(element.compareTo(node.values.get(i)) > 0)
     				i++;
@@ -172,6 +170,10 @@ public class BTree {
 			// need to also declare lists here? Should we use list, arrayList, or arrays??
 			values = new ArrayList<TreeObject>(2*t-1);
 			children = new ArrayList<BTreeNode>(2*t);
+		}
+		
+		public boolean isFull() {
+			return values.size() == 2*t-1;
 		}
 	}
 
