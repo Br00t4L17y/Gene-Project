@@ -1,7 +1,9 @@
 public class TreeObject {
-	Long key;
+	private Long key;
+	private int frequency;
 
 	public TreeObject(String sequence){
+		this.frequency = 0;
 		String binaryVal = "";
 		for(int i = 0; i < sequence.length(); i++){
 			char charVal = sequence.charAt(i);
@@ -25,6 +27,14 @@ public class TreeObject {
 
 	public Long getKey(){
 		return this.key;
+	}
+
+	public void incFrequency(){
+		this.frequency++;
+	}
+
+	public int getFrequency(){
+		return this.frequency;
 	}
 
 	public int compareTo(TreeObject object){
