@@ -19,13 +19,21 @@ public class BTree {
 		rightNode.leaf = leftNode.leaf; 
 
 		// Move elements into the right node 
-		for (int j = 0; j < t - 1; j++) {
-			rightNode.values.add(j, leftNode.values.remove(j+t)); 
+//		for (int j = 0; j < t - 1; j++) {
+//			rightNode.values.add(j, leftNode.values.remove(j+t)); // Problem here Index out of bounds since size of left node changes with the removes
+//		}
+		
+		while(leftNode.values.size() > t) {
+			rightNode.values.add(0,leftNode.values.remove(leftNode.values.size()-1));
 		}
 		// Move children from the left node to the right node if necessary 
 		if (!leftNode.leaf) {
-			for (int j = 0; j < t; j++) {
-				rightNode.children.add(j, leftNode.children.remove(j+t - 1)); 
+//			for (int j = 0; j < t; j++) {
+//				rightNode.children.add(j, leftNode.children.remove(j+t - 1)); 
+//			}
+			
+			while(leftNode.children.size() > t) {
+				rightNode.children.add(0,leftNode.children.remove(leftNode.children.size()-1));
 			}
 		}
 
@@ -49,7 +57,7 @@ public class BTree {
         	if(root.isFull()) {
         		BTreeNode s = new BTreeNode(false, t); // make a new node
         		s.children.add(0, root); 
-        		split(s, 0); //Should this be 0?
+        		split(s, 0); //Splits the child
         		insertNonFull(s, element); 	
         		root = s;
         	}
