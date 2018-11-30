@@ -143,7 +143,7 @@ public class BTree {
 	}
 
 	public String toString(){
-		toString(this.root);
+		return toString(this.root);
 	}
 
 	public String toString(BTreeNode curr){
@@ -152,10 +152,15 @@ public class BTree {
 			int x;
 			for (x = 0; x < curr.values.size(); x++) 
 			{
-				if (!curr.isLeaf()) result += toString(curr.children.get(x)) + current.children.get(x) + "\n";
-				else result += curr.children.get(x) + "\n";
+				if (!curr.isLeaf()){
+					result += toString(curr.children.get(x)) + curr.values.get(x).toString() + "\n";
+				}else{
+					result += curr.values.get(x).toString() + "\n";
+				} 
 			}
-			if (!curr.isLeaf()) result += toString(curr.children.get(x));
+			if (!curr.isLeaf()){
+				result += toString(curr.children.get(x));
+			} 
 			return result;
 	}
 	
