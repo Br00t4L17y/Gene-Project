@@ -1,5 +1,17 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.lang.Enum;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 public class BTree {
     int t; // minimum degree 
@@ -147,7 +159,7 @@ public class BTree {
 	}
 
 	public String toString(BTreeNode curr){
-		if(current == null) return "";
+		if(curr == null) return "";
 			String result = "";
 			int x;
 			for (x = 0; x < curr.values.size(); x++) 
@@ -191,6 +203,10 @@ public class BTree {
 		
 		public boolean isFull() {
 			return values.size() == 2*t-1;
+		}
+
+		public boolean isLeaf(){
+			return this.leaf;
 		}
 	}
 
