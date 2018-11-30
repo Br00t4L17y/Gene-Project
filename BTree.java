@@ -3,8 +3,8 @@ import java.util.ArrayList;
 
 public class BTree {
     int t; // minimum degree 
-    BTreeNode root;
-    ArrayList<BTreeNode> nodes;
+	BTreeNode root;
+	ArrayList<BTreeNode> nodes;
 
 	public BTree(int degree){
 		t = degree;
@@ -102,9 +102,63 @@ public class BTree {
     	
     	}
     	
-    }
-    
+	}
+	
+	public void printToFile() {
+		try{
+			Path current = Paths.get("");
+			String filePath = current.toAbsolutePath().toString();
+			
+			
+			filePath += "/dump";
+			
+						
+			File output = new File(filePath);
+			
+			if(output.exists()) {
+				PrintWriter writer = new PrintWriter(filePath);
+				writer.close();
+			}else {
+				output.createNewFile();
+			}
+			
+			FileWriter fileWriter = new FileWriter(output);
+			PrintWriter printWriter = new PrintWriter(fileWriter);
+			
+			/* Put the logic for the inorder traveral here */
 
+			toString();	
+			// for(int i = 0; i < tableSize; i++) {
+			// 	if(table[i] != null) {
+			// 		printWriter.println("table[" + i + "]: " + table[i].toString());
+			// 	}
+			// }
+			printWriter.close();
+			fileWriter.close();
+			
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}	
+	}
+
+	public String toString(){
+		toString(this.root);
+	}
+
+	public String toString(BTreeNode curr){
+		if(current == null) return "";
+			String result = "";
+			int x;
+			for (x = 0; x < curr.values.size(); x++) 
+			{
+				if (!curr.isLeaf()) result += toString(curr.children.get(x)) + current.children.get(x) + "\n";
+				else result += curr.children.get(x) + "\n";
+			}
+			if (!curr.isLeaf()) result += toString(curr.children.get(x));
+			return result;
+	}
+	
 
 	public class BTreeNode {
 		int minKeys; // represents the number of key elements sorted in a node

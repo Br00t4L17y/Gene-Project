@@ -36,6 +36,10 @@ public class GeneBankCreateBTree {
 			}
 		};
 
+		if (args.length > 5 && Integer.parseInt(args[5]) == 1){
+			tree.printToFile();
+		}
+
 	}
 
 	private static List<String> BuildStringFromFile(String fileName) {
