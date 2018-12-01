@@ -139,7 +139,8 @@ public class BTree {
 			
 			/* Put the logic for the inorder traveral here */
 
-			toString();	
+			printWriter.println(toString());
+			
 			// for(int i = 0; i < tableSize; i++) {
 			// 	if(table[i] != null) {
 			// 		printWriter.println("table[" + i + "]: " + table[i].toString());
