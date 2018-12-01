@@ -70,12 +70,9 @@ public class GeneBankCreateBTree {
 			e.printStackTrace();
 		}
 
-<<<<<<< HEAD
 		//System.out.println("\n" + "In order Traversal: " + "\n"); 
 		//System.out.println(tree.toString());
-=======
 		return retVal;
->>>>>>> 932fd8e92bea22ba3292af86f7cb1e04650a9d73
 	}
 
 	private static List<String> BuildStringFromFile(String fileName) {

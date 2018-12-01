@@ -48,7 +48,8 @@ public class BTree {
     	// if BTree is empty
     	if(root.values.size() == 0) {
     		root = new BTreeNode(true, t);
-    		root.values.add(0, element);
+			root.values.add(0, element);
+			element.incFrequency(); 
     	}
     	
     	// BTree is not empty
@@ -87,7 +88,7 @@ public class BTree {
     	while(i >= 0 && element.compareTo(node.values.get(i)) < 0) {
 			i--;
 			
-			if(i > 0 && node.values.get(i).compareTo(element) == 0) {
+			if(i >= 0 && node.values.get(i).compareTo(element) == 0) {
 				node.values.get(i).incFrequency();
 				return;
 			}
@@ -111,6 +112,10 @@ public class BTree {
     	if(!node.isLeaf()) {   		
     		// if child is full
     		if(node.children.get(i).isFull()) { 
+				if (node.children.get(i).values.get(t-1).compareTo(element) == 0) {
+					node.children.get(i).values.get(t-1).incFrequency();
+					return; 
+				}
     			split(node, i); // split in the book uses index i
     			if(element.compareTo(node.values.get(i)) > 0)
     				i++;
