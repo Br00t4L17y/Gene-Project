@@ -79,7 +79,7 @@ public class BTree {
     	int i = node.values.size() - 1; // the last key in values
     	
     	if(i >= 0 && element.compareTo(node.values.get(i)) == 0) {
-    		element.incFrequency();
+    		node.values.get(i).incFrequency();
     		return;
     	}
     	
@@ -88,13 +88,13 @@ public class BTree {
 			i--;
 			
 			if(i > 0 && node.values.get(i).compareTo(element) == 0) {
-				element.incFrequency();
+				node.values.get(i).incFrequency();
 				return;
 			}
 		}
     	
     	if(i==0 && element.compareTo(node.values.get(i)) == 0) {
-    		element.incFrequency();
+    		node.values.get(i).incFrequency();
 			return;
     	}
     	
