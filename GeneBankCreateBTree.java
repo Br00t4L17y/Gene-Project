@@ -33,10 +33,13 @@ public class GeneBankCreateBTree {
 			}
 		};
 
-		if (args.length > 5 && Integer.parseInt(args[5]) == 1){
-			tree.printToFile();
+		if (Integer.parseInt(args[0]) == 1 && Integer.parseInt(args[4]) > 0) {
+			System.out.println("Using cache");
 		}
 
+		if (args.length > 5 && Integer.parseInt(args[5]) == 1) {
+			tree.printToFile();
+		}
 	}
 
 	private static List<String> BuildStringFromFile(String fileName) {
@@ -46,18 +49,20 @@ public class GeneBankCreateBTree {
 
 		Path relativePath = Paths.get("");
 		String filePath = relativePath.toAbsolutePath().toString() + fileName;
+		String plainTextFile = ConvertFileToText(filePath);
+
 		StringBuilder sequenceBuilder = new StringBuilder();
 
 		try {
-			Scanner reader = new Scanner(new FileReader(filePath));
+			Scanner reader = new Scanner(new FileReader(plainTextFile));
 			while(reader.hasNextLine()) {
 				String line = reader.nextLine();
 				if (!found) {
-					if (line.equalsIgnoreCase(headTag)) {
+					if (line.contains(headTag)) {
 						found = true;
 					}
 				}
-				else if (line.equalsIgnoreCase(tailTag)) {
+				else if (line.contains(tailTag)) {
 					continue;
 				}
 				else {
@@ -91,5 +96,22 @@ public class GeneBankCreateBTree {
 		sequenceList.add(sequenceBuilder.substring(lastIndex, sequenceBuilder.length()));
 
 		return sequenceList;
+	}
+
+	private static String ConvertFileToText(String filePath) {
+		String outputFileName = filePath + ".txt";
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath));
+						PrintWriter pw = new PrintWriter(new FileWriter(outputFileName))) {
+				int count = 1;
+				String line;
+				while ((line = br.readLine()) != null) {
+						pw.printf("%03d %s%n", count, line);
+						count++;
+				}
+		} catch (Exception e) {
+				e.printStackTrace();
+		}
+
+		return outputFileName;
 	}
 }
