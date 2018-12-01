@@ -61,7 +61,7 @@ public class GeneBankCreateBTree {
 				}
 			}
 			if(args.length > 5){
-				retVal.debug = Integer.parseInt(args[5]) ==1;
+				retVal.debug = Integer.parseInt(args[5]) == 1;
 			}
 		
 
@@ -108,9 +108,12 @@ public class GeneBankCreateBTree {
 			exception.printStackTrace();
 		}
 
+		File file = new File(plainTextFile);
+		file.delete();
+
+		
 		List<String> sequenceList = new ArrayList<String>();
 		int lastIndex = 0;
-
 
 		for (int i = 0; i < sequenceBuilder.length(); i++) {
 			String character = sequenceBuilder.substring(i, i + 1);
@@ -125,6 +128,8 @@ public class GeneBankCreateBTree {
 			}			
 		}
 		sequenceList.add(sequenceBuilder.substring(lastIndex, sequenceBuilder.length()));
+
+
 
 		return sequenceList;
 	}
