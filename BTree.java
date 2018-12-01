@@ -1,15 +1,22 @@
 import java.util.List;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
 import java.util.ArrayList;
+import java.lang.Enum;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 public class BTree {
     int t; // minimum degree 
-    BTreeNode root;
-    ArrayList<BTreeNode> nodes;
+	BTreeNode root;
+	ArrayList<BTreeNode> nodes;
 
 	public BTree(int degree){
 		t = degree;
@@ -22,12 +29,20 @@ public class BTree {
 		BTreeNode rightNode = new BTreeNode(true, t);
 		BTreeNode leftNode = parent.children.get(i); 
 		rightNode.leaf = leftNode.leaf; 
+
+		// Move elements into the right node 
+//		for (int j = 0; j < t - 1; j++) {
+//			rightNode.values.add(j, leftNode.values.remove(j+t)); // Problem here Index out of bounds since size of left node changes with the removes
+//		}
 		
 		while(leftNode.values.size() > t) {
 			rightNode.values.add(0,leftNode.values.remove(leftNode.values.size()-1));
 		}
 		// Move children from the left node to the right node if necessary 
 		if (!leftNode.leaf) {
+//			for (int j = 0; j < t; j++) {
+//				rightNode.children.add(j, leftNode.children.remove(j+t - 1)); 
+//			}
 			
 			while(leftNode.children.size() > t) {
 				rightNode.children.add(0,leftNode.children.remove(leftNode.children.size()-1));
@@ -42,9 +57,6 @@ public class BTree {
 	} 
     
     public void add(TreeObject element) {
-    	
-    	// check if the element is already in the tree Where shuold I do this?
-    	
     	// if BTree is empty
     	if(root.values.size() == 0) {
     		root = new BTreeNode(true, t);
@@ -53,9 +65,8 @@ public class BTree {
     	
     	// BTree is not empty
     	else {
-    		
     		// if root is full --> need to create new node and
-    		if(root.isFull()) {
+        	if(root.isFull()) {
         		BTreeNode s = new BTreeNode(false, t); // make a new node
         		s.children.add(0, root); 
         		split(s, 0); //Splits the child
@@ -66,10 +77,11 @@ public class BTree {
         	else {
         		insertNonFull(root, element);
         	}
-    	}    	
+    	}
+    	
+    	
     }
     
-
     /**
      * Inserting helper method, although this method does the real job of locating the place to insert and inserting. 
      * @param node
@@ -78,36 +90,19 @@ public class BTree {
     private void insertNonFull(BTreeNode node, TreeObject element) {
     	int i = node.values.size() - 1; // the last key in values
     	
-    	if(i >= 0 && element.compareTo(node.values.get(i)) == 0) {
-    		element.incFrequency();
-    		return;
-    	}
-    	
     	// Determine correct index to insert at 
     	while(i >= 0 && element.compareTo(node.values.get(i)) < 0) {
 			i--;
-			
-			if(i > 0 && node.values.get(i).compareTo(element) == 0) {
-				element.incFrequency();
-				return;
-			}
 		}
-    	
-    	if(i==0 && element.compareTo(node.values.get(i)) == 0) {
-    		element.incFrequency();
-			return;
-    	}
-    	
-    	i++;
-    	
+    	i++; 
     	
     	// if node is a leaf then we can insert 
-    	if(node.isLeaf()) {
+    	if(node.leaf) {
     		node.values.add(i, element);
     	}
     	
     	// if node is not a leaf then we cannot insert and we need to determine the correct child to descend the tree
-    	if(!node.isLeaf()) {   		
+    	else {    		
     		// if child is full
     		if(node.children.get(i).isFull()) { 
     			split(node, i); // split in the book uses index i
@@ -118,9 +113,9 @@ public class BTree {
     	insertNonFull(node.children.get(i), element);
     	
     	}
-    }
-    
-
+    	
+	}
+	
 	public void printToFile() {
 		try{
 			Path current = Paths.get("");
@@ -144,7 +139,8 @@ public class BTree {
 			
 			/* Put the logic for the inorder traveral here */
 
-			toString();	
+			printWriter.println(toString());
+			
 			// for(int i = 0; i < tableSize; i++) {
 			// 	if(table[i] != null) {
 			// 		printWriter.println("table[" + i + "]: " + table[i].toString());
@@ -170,9 +166,9 @@ public class BTree {
 			for (x = 0; x < curr.values.size(); x++) 
 			{
 				if (!curr.isLeaf()){
-					result += toString(curr.children.get(x)) + curr.values.get(x).toString()+ "\n"; 
+					result += toString(curr.children.get(x)) + curr.values.get(x).toString() + "\n";
 				}else{
-					result += curr.values.get(x).toString()+ "\n";
+					result += curr.values.get(x).toString() + "\n";
 				} 
 			}
 			if (!curr.isLeaf()){
@@ -180,7 +176,7 @@ public class BTree {
 			} 
 			return result;
 	}
-    
+	
 
 	public class BTreeNode {
 		int minKeys; // represents the number of key elements sorted in a node
@@ -209,7 +205,7 @@ public class BTree {
 		public boolean isFull() {
 			return values.size() == 2*t-1;
 		}
-		
+
 		public boolean isLeaf(){
 			return this.leaf;
 		}
