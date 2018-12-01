@@ -15,13 +15,17 @@ import java.io.PrintWriter;
 public class GeneBankCreateBTree {
 
 	public static void main(String args[]) {
-		BTree tree = new BTree(Integer.parseInt(args[1]));
+		
+		Arguments arguments = assignArguments(args);
+		
+		
+		BTree tree = new BTree(arguments.degree);
 
-		List<String> nucleotideSequences = BuildStringFromFile(args[2]);
+		List<String> nucleotideSequences = BuildStringFromFile(arguments.fileName);
 		
 		for (int i = 0; i < nucleotideSequences.size(); i++) {
 			String sequence = nucleotideSequences.get(i);
-			int seqLength = Integer.parseInt(args[3]);
+			int seqLength = arguments.sequence;
 
 			if (sequence.length() >= seqLength) {
 				int iterations = sequence.length() - seqLength + 1;
@@ -33,16 +37,45 @@ public class GeneBankCreateBTree {
 			}
 		};
 
-		if (Integer.parseInt(args[0]) == 1 && Integer.parseInt(args[4]) > 0) {
-			System.out.println("Using cache");
-		}
-
-		if (args.length > 5 && Integer.parseInt(args[5]) == 1) {
+		if (arguments.debug) {
 			tree.printToFile();
 		}
+	}
 
+	private static Arguments assignArguments(String[] args){
+		Arguments retVal = new Arguments();
+		
+		try{
+			if(args.length < 4 || (Integer.parseInt(args[0]) == 1 && args.length < 5)){
+				throw new IllegalArgumentException();
+			}
+			retVal.cache = Integer.parseInt(args[0]) == 1;
+			retVal.degree = Integer.parseInt(args[1]);
+			retVal.fileName = args[2];
+			retVal.sequence = Integer.parseInt(args[3]);
+			if(retVal.cache){
+				retVal.cachSize = Integer.parseInt(args[4]);
+			}else{
+				if(args.length > 4){
+					retVal.debug = Integer.parseInt(args[4]) == 1;
+				}
+			}
+			if(args.length > 5){
+				retVal.debug = Integer.parseInt(args[5]) == 1;
+			}
+		
+
+
+		}catch(IllegalArgumentException e){
+			e.printStackTrace();
+		}
+
+<<<<<<< HEAD
 		//System.out.println("\n" + "In order Traversal: " + "\n"); 
 		//System.out.println(tree.toString());
+=======
+		return retVal;
+>>>>>>> 932fd8e92bea22ba3292af86f7cb1e04650a9d73
 	}
 
 	private static List<String> BuildStringFromFile(String fileName) {
@@ -80,9 +113,12 @@ public class GeneBankCreateBTree {
 			exception.printStackTrace();
 		}
 
+		File file = new File(plainTextFile);
+		file.delete();
+
+		
 		List<String> sequenceList = new ArrayList<String>();
 		int lastIndex = 0;
-
 
 		for (int i = 0; i < sequenceBuilder.length(); i++) {
 			String character = sequenceBuilder.substring(i, i + 1);
@@ -97,6 +133,8 @@ public class GeneBankCreateBTree {
 			}			
 		}
 		sequenceList.add(sequenceBuilder.substring(lastIndex, sequenceBuilder.length()));
+
+
 
 		return sequenceList;
 	}
