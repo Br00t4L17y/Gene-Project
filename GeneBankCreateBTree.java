@@ -15,13 +15,17 @@ import java.io.PrintWriter;
 public class GeneBankCreateBTree {
 
 	public static void main(String args[]) {
-		BTree tree = new BTree(Integer.parseInt(args[1]));
+		
+		Arguments arguments = assignArguments(args);
+		
+		
+		BTree tree = new BTree(arguments.degree);
 
-		List<String> nucleotideSequences = BuildStringFromFile(args[2]);
+		List<String> nucleotideSequences = BuildStringFromFile(arguments.fileName);
 		
 		for (int i = 0; i < nucleotideSequences.size(); i++) {
 			String sequence = nucleotideSequences.get(i);
-			int seqLength = Integer.parseInt(args[3]);
+			int seqLength = arguments.sequence;
 
 			if (sequence.length() >= seqLength) {
 				int iterations = sequence.length() - seqLength + 1;
@@ -33,13 +37,40 @@ public class GeneBankCreateBTree {
 			}
 		};
 
-		if (Integer.parseInt(args[0]) == 1 && Integer.parseInt(args[4]) > 0) {
-			System.out.println("Using cache");
-		}
-
-		if (args.length > 5 && Integer.parseInt(args[5]) == 1) {
+		if (arguments.debug) {
 			tree.printToFile();
 		}
+	}
+
+	private static Arguments assignArguments(String[] args){
+		Arguments retVal = new Arguments();
+		
+		try{
+			if(args.length < 4 || (Integer.parseInt(args[0]) == 1 && args.length < 5)){
+				throw new IllegalArgumentException();
+			}
+			retVal.cache = Integer.parseInt(args[0]) == 1;
+			retVal.degree = Integer.parseInt(args[1]);
+			retVal.fileName = args[2];
+			retVal.sequence = Integer.parseInt(args[3]);
+			if(retVal.cache){
+				retVal.cachSize = Integer.parseInt(args[4]);
+			}else{
+				if(args.length > 4){
+					retVal.debug = Integer.parseInt(args[4]) == 1;
+				}
+			}
+			if(args.length > 5){
+				retVal.debug = Integer.parseInt(args[5]) ==1;
+			}
+		
+
+
+		}catch(IllegalArgumentException e){
+			e.printStackTrace();
+		}
+
+		return retVal;
 	}
 
 	private static List<String> BuildStringFromFile(String fileName) {
