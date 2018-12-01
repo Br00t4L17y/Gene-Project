@@ -7,12 +7,15 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
 import java.lang.Enum;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 
 public class GeneBankCreateBTree {
+
+	enum Nucleotide {
+		A,
+		C,
+		G,
+		T;
+	}
 
 	public static void main(String args[]) {
 		BTree tree = new BTree(Integer.parseInt(args[1]));
@@ -31,11 +34,10 @@ public class GeneBankCreateBTree {
 					tree.add(treeObject);
 				}
 			}
-		};
-
-		if (args.length > 5 && Integer.parseInt(args[5]) == 1){
-			tree.printToFile();
 		}
+		
+		//System.out.println("\n"+"In order Traversal: " + "\n");
+		//System.out.println(tree.toString());
 
 	}
 
