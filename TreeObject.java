@@ -1,8 +1,10 @@
 public class TreeObject {
 	private Long key;
 	private int frequency;
+	private String sequence;
 
 	public TreeObject(String sequence){
+		this.sequence = sequence;
 		this.frequency = 0;
 		String binaryVal = "";
 		for(int i = 0; i < sequence.length(); i++){
@@ -52,5 +54,9 @@ public class TreeObject {
 			return 0;
 		}
 		return 1;
+	}
+
+	public String toString(){
+		return this.sequence + ": " + this.frequency;
 	}
 }
