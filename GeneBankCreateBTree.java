@@ -14,13 +14,6 @@ import java.io.PrintWriter;
 
 public class GeneBankCreateBTree {
 
-	enum Nucleotide {
-		A,
-		C,
-		G,
-		T;
-	}
-
 	public static void main(String args[]) {
 		BTree tree = new BTree(Integer.parseInt(args[1]));
 
