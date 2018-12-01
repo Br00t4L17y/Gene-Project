@@ -40,6 +40,9 @@ public class GeneBankCreateBTree {
 		if (args.length > 5 && Integer.parseInt(args[5]) == 1) {
 			tree.printToFile();
 		}
+
+		//System.out.println("\n" + "In order Traversal: " + "\n"); 
+		//System.out.println(tree.toString());
 	}
 
 	private static List<String> BuildStringFromFile(String fileName) {

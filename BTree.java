@@ -103,7 +103,8 @@ public class BTree {
     	
     	// if node is a leaf then we can insert 
     	if(node.isLeaf()) {
-    		node.values.add(i, element);
+			node.values.add(i, element);
+			element.incFrequency();
     	}
     	
     	// if node is not a leaf then we cannot insert and we need to determine the correct child to descend the tree

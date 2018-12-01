@@ -57,6 +57,6 @@ public class TreeObject {
 	}
 
 	public String toString(){
-		return this.sequence + ": " + this.frequency;
+		return this.sequence.toLowerCase() + ": " + this.frequency;
 	}
 }
