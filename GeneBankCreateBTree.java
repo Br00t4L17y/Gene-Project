@@ -69,9 +69,7 @@ public class GeneBankCreateBTree {
 		}catch(IllegalArgumentException e){
 			e.printStackTrace();
 		}
-
-		//System.out.println("\n" + "In order Traversal: " + "\n"); 
-		//System.out.println(tree.toString());
+		
 		return retVal;
 	}
 
