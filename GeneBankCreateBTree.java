@@ -16,12 +16,9 @@ public class GeneBankCreateBTree {
 
 	public static void main(String args[]) {
 		
-		Arguments arguments = assignArguments(args);
-		
-		
-		BTree tree = new BTree(arguments.degree);
-
+		CreateArguments arguments = AssignArguments(args);
 		List<String> nucleotideSequences = BuildStringFromFile(arguments.fileName);
+		BTree tree = new BTree(arguments.degree);
 		
 		for (int i = 0; i < nucleotideSequences.size(); i++) {
 			String sequence = nucleotideSequences.get(i);
@@ -42,31 +39,32 @@ public class GeneBankCreateBTree {
 		}
 	}
 
-	private static Arguments assignArguments(String[] args){
-		Arguments retVal = new Arguments();
+	private static CreateArguments AssignArguments(String[] args) {
+		CreateArguments retVal = new CreateArguments();
 		
-		try{
-			if(args.length < 4 || (Integer.parseInt(args[0]) == 1 && args.length < 5)){
+		try {
+			if (args.length < 4 || (Integer.parseInt(args[0]) == 1 && args.length < 5))	{
 				throw new IllegalArgumentException();
 			}
 			retVal.cache = Integer.parseInt(args[0]) == 1;
 			retVal.degree = Integer.parseInt(args[1]);
 			retVal.fileName = args[2];
 			retVal.sequence = Integer.parseInt(args[3]);
-			if(retVal.cache){
+			if (retVal.cache)	{
 				retVal.cachSize = Integer.parseInt(args[4]);
-			}else{
-				if(args.length > 4){
+			}
+			else {
+				if (args.length > 4) {
 					retVal.debug = Integer.parseInt(args[4]) == 1;
 				}
 			}
-			if(args.length > 5){
+			if (args.length > 5) {
 				retVal.debug = Integer.parseInt(args[5]) == 1;
 			}
 		
 
 
-		}catch(IllegalArgumentException e){
+		} catch(IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 		
