@@ -1,4 +1,24 @@
-import java.awt.List;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Scanner;
+import java.util.List;
+import java.util.ArrayList;
+import java.lang.Enum;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 
 public class GeneBankSearch {
 	public static void main(String args[]) {
@@ -10,15 +30,15 @@ public class GeneBankSearch {
 		
 		for (int i = 0; i < querySequences.size(); i++) {
 			String sequence = querySequences.get(i);
-
-			TreeObject treeObject = new TreeObject(sequence);
-			TreeObject result = GeneBankCreateBTree.search(arguments.btreeFileName, treeObject);
+			System.out.println(querySequences.get(i));
+			// TreeObject treeObject = new TreeObject(sequence);
+			// TreeObject result = GeneBankCreateBTree.search(arguments.btreeFileName, treeObject);
 			
-			if(result == null){
-				System.out.println(querySequences.get(i) + ": 0" );
-			}else{
-				System.out.println(result.toString());
-			}
+			// if(result == null){
+			// 	System.out.println(querySequences.get(i) + ": 0" );
+			// }else{
+			// 	System.out.println(result.toString());
+			// }
 			
 
 		}
@@ -58,13 +78,11 @@ public class GeneBankSearch {
 
 		Path relativePath = Paths.get("");
 		String filePath = relativePath.toAbsolutePath().toString() + fileName;
-		String plainTextFile = ConvertFileToText(filePath);
 
-		StringBuilder sequenceBuilder = new StringBuilder();
-
+		List<String> sequenceList = new ArrayList<String>();
 		try {
-			Scanner reader = new Scanner(new FileReader(plainTextFile));
-			List<String> sequenceList = new ArrayList<String>();
+			Scanner reader = new Scanner(new FileReader(filePath));
+			
 			while(reader.hasNextLine()) {
 				String line = reader.nextLine();
 				sequenceList.add(line);
@@ -74,27 +92,7 @@ public class GeneBankSearch {
 		} catch (IOException exception) {
 			exception.printStackTrace();
 		}
-
-		File file = new File(plainTextFile);
-		file.delete();
 		
 		return sequenceList;
-	}
-
-	private static String ConvertFileToText(String filePath) {
-		String outputFileName = filePath + ".txt";
-		try (BufferedReader br = new BufferedReader(new FileReader(filePath));
-						PrintWriter pw = new PrintWriter(new FileWriter(outputFileName))) {
-				int count = 1;
-				String line;
-				while ((line = br.readLine()) != null) {
-						pw.printf("%03d %s%n", count, line);
-						count++;
-				}
-		} catch (Exception e) {
-				e.printStackTrace();
-		}
-
-		return outputFileName;
 	}
 }
