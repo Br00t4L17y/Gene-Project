@@ -1,3 +1,5 @@
+import java.awt.List;
+
 public class GeneBankSearch {
 	public static void main(String args[]) {
 		System.out.print("Search program started.");
@@ -11,7 +13,13 @@ public class GeneBankSearch {
 
 			TreeObject treeObject = new TreeObject(sequence);
 			TreeObject result = GeneBankCreateBTree.search(arguments.btreeFileName, treeObject);
-			System.out.println(result.toString());
+			
+			if(result == null){
+				System.out.println(querySequences.get(i) + ": 0" );
+			}else{
+				System.out.println(result.toString());
+			}
+			
 
 		}
 	}
@@ -47,9 +55,6 @@ public class GeneBankSearch {
 	}
 
 	private static List<String> BuildStringFromFile(String fileName) {
-		String headTag = "ORIGIN";
-		String tailTag = "//";
-		boolean found = false;
 
 		Path relativePath = Paths.get("");
 		String filePath = relativePath.toAbsolutePath().toString() + fileName;
@@ -59,21 +64,10 @@ public class GeneBankSearch {
 
 		try {
 			Scanner reader = new Scanner(new FileReader(plainTextFile));
+			List<String> sequenceList = new ArrayList<String>();
 			while(reader.hasNextLine()) {
 				String line = reader.nextLine();
-				if (!found) {
-					if (line.contains(headTag)) {
-						found = true;
-					}
-				}
-				else if (line.contains(tailTag)) {
-					continue;
-				}
-				else {
-					line = line.replaceAll(" ", "");
-					line = line.replaceAll("\\d", "");
-					sequenceBuilder.append(line.toUpperCase());
-				}
+				sequenceList.add(line);
 			}
 
 			reader.close();
@@ -83,27 +77,7 @@ public class GeneBankSearch {
 
 		File file = new File(plainTextFile);
 		file.delete();
-
 		
-		List<String> sequenceList = new ArrayList<String>();
-		int lastIndex = 0;
-
-		for (int i = 0; i < sequenceBuilder.length(); i++) {
-			String character = sequenceBuilder.substring(i, i + 1);
-			try {
-				Nucleotide.valueOf(character);
-			} 
-			catch (IllegalArgumentException e) {
-				if (lastIndex != i) {
-					sequenceList.add(sequenceBuilder.substring(lastIndex, i));				
-				}
-				lastIndex = i + 1;
-			}			
-		}
-		sequenceList.add(sequenceBuilder.substring(lastIndex, sequenceBuilder.length()));
-
-
-
 		return sequenceList;
 	}
 

@@ -13,12 +13,12 @@ This program implements a searchable BTree using input files of known DNA sequen
 INCLUDED FILES:
 
  * Nucleotide.java - Enum file. Used to store the values for the four types of letters that represent nucleotides in a DNA sequence.
- * SearchArguments.java - Helper class file. //TODO: Add what it does.
- * CreateArguments.java - Helper class file. //TODO: Add what it does.
- * GeneBankCreateBTree.java - Driver class file. //TODO: Add what it does.
+ * SearchArguments.java - Helper class file. Stores the arguments that are passed into GeneBankSearch.java
+ * CreateArguments.java - Helper class file. Stores the arguments that are passed into GeneBankCreateBTree.java
+ * GeneBankCreateBTree.java - Driver class file. Creates a BTree with given degree and sequence length specified by user input arguments
  * GeneBankSearch.java - Driver class file. //TODO: Add what it does.
- * BTree.java - Abstract data type. //TODO: Add what it does.
- * TreeObject.java - Abstract data type. //TODO: Add what it does.
+ * BTree.java - Abstract data type. Hold all of the functionality for creating and searching the BTree. Also includes inner BTreeNode class.
+ * TreeObject.java - Abstract data type. Takes in a sequence and converts it to a long binary value used as the key value.
  * README - this file
 
 
@@ -36,11 +36,11 @@ COMPILING AND RUNNING:
 
  where:
   * 0/1(no/with cache): //TODO: Description
-	* degree: //TODO: Description
-	* gbkFile: //TODO: Description
-	* sequenceLength: //TODO: Description
+	* degree: Specifies the degree of the BTree
+	* gbkFile: Specifies the DNA file that will be parsed to create the TreeObjects
+	* sequenceLength: Determines the length of each DNA sequence (must be between 1 and 31)
 	* cacheSize: optional argument. //TODO: Description
-	* debugLevel: optional argument. //TODO: Description
+	* debugLevel: optional argument. If 1, sequence and frequency are printed in a dump file
 
  Console output will give the results after the program finishes.
 
