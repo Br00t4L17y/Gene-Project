@@ -20,7 +20,7 @@ public class BTree implements Serializable {
     int t; // minimum degree 
     BTreeNode root;
     ArrayList<BTreeNode> nodes;
-    int nodeSize = 4096; 
+    int nodeSize = 4096;   // hardcoded this in; if we have time we may want to calculate the exact value to save space
     int nextPosition; 
     
     String bFile;
