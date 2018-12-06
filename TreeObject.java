@@ -1,9 +1,13 @@
-public class TreeObject {
+import java.io.Serializable;
+
+public class TreeObject implements Serializable {
+	private static final long serialVersionUID = -7404766932017737110L; 
+	
 	private Long key;
 	private int frequency;
 	private String sequence;
 
-	public TreeObject(String sequence){
+	public TreeObject(String sequence) {
 		this.sequence = sequence;
 		this.frequency = 0;
 		String binaryVal = "";
