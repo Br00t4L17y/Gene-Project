@@ -1,20 +1,159 @@
-import java.util.List;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.io.Serializable;
 
-public class BTree {
+public class BTree implements Serializable {
+	private static final long serialVersionUID = -7504766932017737111L;
+
     int t; // minimum degree 
     BTreeNode root;
     ArrayList<BTreeNode> nodes;
+    int nodeSize = 4096; 
+    int nextPosition; 
+    
+    String bFile;
 
-	public BTree(int degree){
+	public BTree(int degree, String gbkFile, int seqLength) throws IOException, ClassNotFoundException {
 		t = degree;
-		//nodes = new ArrayList<BTreeNode>();
+		bFile = gbkFile.substring(1) + ".btree.data." + seqLength + "." + t; 
+		//nodeSize = (256 * t) - 88; 
 		root = new BTreeNode(true, t);
+		
+		/*String[] letters = {"C", "A", "G"}; 
+		for (int i = 0; i < 3; i++) {
+			TreeObject to = new TreeObject(letters[i]); 
+			add(to); 
+		}
+		
+		
+		
+		
+		diskWrite(0, root); 
+		
+
+		System.out.println("Root Node: " + diskRead(0).values.get(0).toString());*/
+		
+		 try {
+			 RandomAccessFile bTreeFile = new RandomAccessFile(bFile, "rw"); 
+			 
+             RandomAccessFile out = new RandomAccessFile("metadata.bin", "rw");
+             FileChannel fout = out.getChannel();
+             fout.truncate(0); // truncate the file
+
+
+     		int rootPosition = 0; 
+     		int numChildren = 0; 
+             
+             ByteBuffer buff = ByteBuffer.allocateDirect(32 * 3);
+             
+             buff.putInt(rootPosition);
+             buff.putInt(t); 
+             buff.putInt(numChildren); 
+             
+             if (!buff.hasRemaining()) {
+                 buff.flip();
+                 fout.write(buff);
+                 buff.clear();
+             }
+             
+             if (buff.position() > 0) {
+                 buff.flip();
+                 fout.write(buff);
+                 buff.clear();
+             }	
+             
+             fout.close();
+
+		 } catch (IOException e) {
+             System.err.println(e);
+             System.exit(1);
+
+		 }
+		
+		
+	}
+	
+	private void diskWrite(int pos, BTreeNode node) {
+		try {
+			RandomAccessFile out = new RandomAccessFile(bFile, "rw"); 
+			 
+            FileChannel fout = out.getChannel();
+            fout.truncate(0); // truncate the file
+            
+            ByteBuffer buff = ByteBuffer.allocateDirect(nodeSize);
+            System.out.println("Node size: " + nodeSize);
+            byte[] serializedNode = toStream(node); 
+
+            System.out.println("The size of the object is: " + serializedNode.length);
+            byte[] fullSerializedNode = new byte[nodeSize]; 
+            for (int i = 0; i < serializedNode.length; i++) {
+            	fullSerializedNode[i] = serializedNode[i]; 
+            }
+            
+            buff.put(fullSerializedNode, pos, nodeSize); 
+           
+            if (!buff.hasRemaining()) {
+                buff.flip();
+                fout.write(buff);
+                buff.clear();
+            }
+            
+            if (buff.position() > 0) {
+                buff.flip();
+                fout.write(buff);
+                buff.clear();
+            }	
+            
+            fout.close();
+
+		 } catch (IOException e) {
+            System.err.println(e);
+            System.exit(1);
+
+		 }
+	}
+	
+	private BTreeNode diskRead(int pos) throws IOException, ClassNotFoundException {
+
+		ByteBuffer buffer = ByteBuffer.allocateDirect(nodeSize);
+
+        FileChannel dataFile = new RandomAccessFile(bFile,"rw").getChannel();
+
+        dataFile.position(pos);
+        buffer.clear();
+        dataFile.read(buffer);
+        buffer.flip();
+        byte[] data = new byte[nodeSize]; 
+        buffer.get(data);
+        
+        ByteArrayInputStream in = new ByteArrayInputStream(data);
+        ObjectInputStream is = new ObjectInputStream(in);
+        return (BTreeNode)is.readObject();
+        
+	}
+	
+	public static byte[] toStream(BTreeNode node) {
+	    byte[] stream = null;
+	    try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	            ObjectOutputStream oos = new ObjectOutputStream(baos);) {
+	        oos.writeObject(node);
+	        stream = baos.toByteArray();
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	    return stream;
 	}
 	
     private void split(BTreeNode parent, int i) {
@@ -41,7 +180,7 @@ public class BTree {
 		parent.values.add(i, leftNode.values.remove(t - 1)); 
 	} 
     
-    public void add(TreeObject element) {
+    public void add(TreeObject element) throws IOException {
     	
     	// check if the element is already in the tree Where shuold I do this?
     	
@@ -75,8 +214,9 @@ public class BTree {
      * Inserting helper method, although this method does the real job of locating the place to insert and inserting. 
      * @param node
      * @param element
+     * @throws IOException 
      */
-    private void insertNonFull(BTreeNode node, TreeObject element) {
+    private void insertNonFull(BTreeNode node, TreeObject element) throws IOException {
     	int i = node.values.size() - 1; // the last key in values
     	
     	if(i >= 0 && element.compareTo(node.values.get(i)) == 0) {
@@ -106,6 +246,7 @@ public class BTree {
     	if(node.isLeaf()) {
 			node.values.add(i, element);
 			element.incFrequency();
+			//writeBTreeObject(node);
     	}
     	
     	// if node is not a leaf then we cannot insert and we need to determine the correct child to descend the tree
@@ -182,6 +323,7 @@ public class BTree {
 		return toString(this.root);
 	}
 
+	// inorder 
 	public String toString(BTreeNode curr){
 		if(curr == null) return "";
 			String result = "";
@@ -199,27 +341,60 @@ public class BTree {
 			} 
 			return result;
 	}
+	
+	// levelorder 
+/*	public String toString(BTreeNode curr){
+		if(curr == null) return "";
+			String result = "";
+			int x;
+			for (x = 0; x < curr.values.size(); x++) 
+			{
+				result += curr.values.get(x) + "\n"; 
+				
+			}
+			if (!curr.isLeaf() || curr.children.size() == 0) {
+
+				if (curr.children.size() != 0 && curr.children.size() < 2 * t) {
+					for (int i = curr.children.size(); i < 2 * t; i++) {
+						BTreeNode newNode = new BTreeNode(true, t); 
+						if (!curr.children.get(0).isLeaf()) {
+							newNode.setLeaf(false);
+						}
+						
+						
+						curr.children.add(newNode);
+					}
+				}
+				if (curr.children.size() == 0) {
+					result += "BLANK\n";
+				}
+				for (x = 0; x < curr.children.size(); x++) 
+				{
+					result += toString(curr.children.get(x)); 
+					
+				}
+			}
+			
+			return result;
+	}*/
     
 
-	public class BTreeNode {
-		int minKeys; // represents the number of key elements sorted in a node
-		int maxKeys;
+	public class BTreeNode implements Serializable {
+		private static final long serialVersionUID = -7504766932017737110L; 
+		
 		boolean leaf;
 		ArrayList<BTreeNode> children;
 		ArrayList<TreeObject> values; 
 		
 		public BTreeNode() {
-			minKeys = (BTree.this.t - 1);
-			maxKeys = ((2 * BTree.this.t) - 1);
 			values = new ArrayList<TreeObject>(2*BTree.this.t - 1);
 			children = new ArrayList<BTreeNode>(2*BTree.this.t);
-			leaf = true;
+			leaf = false;
 		}
 
 		public BTreeNode(boolean isLeaf, int t){
+			
 			leaf = isLeaf;
-			minKeys = (t - 1);
-			maxKeys = ((2 * t) - 1);
 			// need to also declare lists here? Should we use list, arrayList, or arrays??
 			values = new ArrayList<TreeObject>(2*t-1);
 			children = new ArrayList<BTreeNode>(2*t);
@@ -231,6 +406,10 @@ public class BTree {
 		
 		public boolean isLeaf(){
 			return this.leaf;
+		}
+		
+		public void setLeaf(boolean b) {
+			this.leaf = b;
 		}
 	}
 

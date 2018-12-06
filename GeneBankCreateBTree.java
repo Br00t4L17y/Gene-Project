@@ -12,13 +12,26 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+
 public class GeneBankCreateBTree {
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws IOException, ClassNotFoundException {
 		
 		CreateArguments arguments = AssignArguments(args);
 		List<String> nucleotideSequences = BuildStringFromFile(arguments.fileName);
-		BTree tree = new BTree(arguments.degree);
+
+		//String binaryFileName = arguments.fileName + ".btree." + arguments.sequence + "." + arguments.degree; 
+		//ObjectOutput out = new ObjectOutputStream(new FileOutputStream("test.ser"));
+
+		BTree tree = new BTree(arguments.degree, arguments.fileName, arguments.sequence);
+	
 		
 		for (int i = 0; i < nucleotideSequences.size(); i++) {
 			String sequence = nucleotideSequences.get(i);
@@ -36,7 +49,8 @@ public class GeneBankCreateBTree {
 
 		if (arguments.debug) {
 			tree.printToFile();
-		}
+		} 
+
 	}
 
 	private static CreateArguments AssignArguments(String[] args) {
@@ -148,4 +162,5 @@ public class GeneBankCreateBTree {
 
 		return outputFileName;
 	}
+	
 }
