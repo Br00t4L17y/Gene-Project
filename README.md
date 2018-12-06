@@ -16,7 +16,7 @@ INCLUDED FILES:
  * SearchArguments.java - Helper class file. Stores the arguments that are passed into GeneBankSearch.java
  * CreateArguments.java - Helper class file. Stores the arguments that are passed into GeneBankCreateBTree.java
  * GeneBankCreateBTree.java - Driver class file. Creates a BTree with given degree and sequence length specified by user input arguments
- * GeneBankSearch.java - Driver class file. //TODO: Add what it does.
+ * GeneBankSearch.java - Driver class file. Reads in a BTree binary file as well as a query file. Uses the BTree file to search for the sequences in the query file and displays the sequence and frequency to console.
  * BTree.java - Abstract data type. Hold all of the functionality for creating and searching the BTree. Also includes inner BTreeNode class.
  * TreeObject.java - Abstract data type. Takes in a sequence and converts it to a long binary value used as the key value.
  * README - this file
@@ -56,10 +56,10 @@ COMPILING AND RUNNING:
 
  where:
   * 0/1(no/with cache): //TODO: Description
-	* btreeFile: //TODO: Description
-	* queryFile: //TODO: Description
-	* cacheSize: optional argument. //TODO: Description
-	* debugLevel: optional argument. //TODO: Description
+	* btreeFile: This is a binary BTree file created by GeneBankCreateBTree
+	* queryFile: Contains sequences to search for in the BTree
+	* cacheSize: optional argument. Specifies the size of the cache if one is being used
+	* debugLevel: optional argument. Displays output to console if set to 0 or not specified
 
  Console output will give the results after the program finishes.
 
@@ -89,7 +89,7 @@ TESTING:
 
 DISCUSSION:
  
- //TODO: Process
+ Our process proved to be very effective. We got everyone setup with GitHub so that we could make a project repository to all work on. A couple of us had never used Git before so there was a little quick learning that needed to be done so that we could all be on the same page. After getting Git all setup we sat down together to plan out the sections of the project and their priority. We originally decided on a 3-phase, 3-week process. Week 1 was going to be dedicated to everything we needed to read in the GeneBank file and create the BTree. Week 2 was going to be for Writing everything that had to do with Searching the BTree. Week 3 was then set to be debugging and working out any final issues. We split the tasks for phase 1 up amongst the 4 of us and then went to Thanksgiving break. Our next meeting was the final Sunday of Thanksgiving break. We got together to discuss what we had done. Debugging was mandatory as not everything was working together the right way. We worked through those issues and realized that we forgot to implement the debug option and writing to a binary file. We spent week 2 fixing issues adding and splitting, adding argument handling, implementing debug level, and trying the figure out how to writie the BTree to a binary file. The binary file created the most issues for us in this project. We spent a long time trying to figure out the concept and the implementation of it.  
 
  //TODO: Breakthroughs/Eurika Moments
 
