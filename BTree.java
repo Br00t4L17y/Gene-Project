@@ -383,21 +383,22 @@ public class BTree implements Serializable {
 		private static final long serialVersionUID = -7504766932017737110L; 
 		
 		boolean leaf;
-		ArrayList<BTreeNode> children;
-		ArrayList<TreeObject> values; 
+		ArrayList<TreeObject> values;
+		ArrayList<Integer> offsetOfChildren;
+		int offset;
+		 
 		
 		public BTreeNode() {
 			values = new ArrayList<TreeObject>(2*BTree.this.t - 1);
-			children = new ArrayList<BTreeNode>(2*BTree.this.t);
+			offsetOfChildren = new ArrayList<Integer>(2*BTree.this.t);
 			leaf = false;
 		}
 
 		public BTreeNode(boolean isLeaf, int t){
 			
 			leaf = isLeaf;
-			// need to also declare lists here? Should we use list, arrayList, or arrays??
 			values = new ArrayList<TreeObject>(2*t-1);
-			children = new ArrayList<BTreeNode>(2*t);
+			offsetOfChildren = new ArrayList<Integer>(2*t);
 		}
 		
 		public boolean isFull() {
