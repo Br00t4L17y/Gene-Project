@@ -93,7 +93,7 @@ DISCUSSION:
 
  //TODO: Breakthroughs/Eurika Moments
 
- //TODO: How you felt about the project in whole
+ The concepts that we have learned throughout the course of this project have been really great to learn. I think
 
  
 EXTRA CREDIT:
