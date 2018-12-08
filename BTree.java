@@ -29,7 +29,7 @@ public class BTree implements Serializable{
 
 	public BTree(int degree, String gbkFile, int seqLength) throws IOException, ClassNotFoundException {
 		t = degree;
-		nodeSize = 100000; //(68*t + 600 + 200);
+		nodeSize = 10000;//70*t + 900;
 		nextPosition = 0;
 		bFile = gbkFile.substring(1) + ".btree.data." + seqLength + "." + t; 
 		metaData = new RandomAccessFile("metadata.bin", "rw");
@@ -206,7 +206,7 @@ public class BTree implements Serializable{
     	
     	if(i >= 0 && element.compareTo(node.values.get(i)) == 0) {
     		node.values.get(i).incFrequency();
-    		diskWrite(node.offset,node);
+    		diskWrite(node.getOffset(),node);
     		return;
     	}
     	
@@ -216,14 +216,14 @@ public class BTree implements Serializable{
 			
 			if(i >= 0 && node.values.get(i).compareTo(element) == 0) {
 				node.values.get(i).incFrequency();
-				diskWrite(node.offset,node);
+				diskWrite(node.getOffset(),node);
 				return;
 			}
 		}
     	
     	if(i==0 && element.compareTo(node.values.get(i)) == 0) {
     		node.values.get(i).incFrequency();
-    		diskWrite(node.offset,node);
+    		diskWrite(node.getOffset(),node);
 			return;
     	}
     	
@@ -245,6 +245,7 @@ public class BTree implements Serializable{
     		if(childNode.isFull()) { 
 				if (childNode.values.get(t-1).compareTo(element) == 0) {
 					childNode.values.get(t-1).incFrequency();
+					diskWrite(childNode.getOffset(), childNode);
 					return; 
 				}
     			split(node, i); // split in the book uses index i
@@ -252,7 +253,7 @@ public class BTree implements Serializable{
     				i++;
     		}
     		
-    	insertNonFull(childNode, element);
+    	insertNonFull(diskRead(node.offsetOfChildren.get(i)), element);
     	
     	}
     }
@@ -321,8 +322,8 @@ public class BTree implements Serializable{
 			BTreeNode currChild = null;
 			for (x = 0; x < curr.values.size(); x++) 
 			{
-				System.out.println(curr.offset);
-				System.out.println(curr.offsetOfChildren.size());
+				//System.out.println(curr.offset);
+				//System.out.println(curr.offsetOfChildren.size());
 				
 				if (!curr.isLeaf()){
 					currChild = diskRead(curr.offsetOfChildren.get(x));
@@ -332,7 +333,7 @@ public class BTree implements Serializable{
 				} 
 			}
 			if (!curr.isLeaf()){
-				result += toString(diskRead(curr.offsetOfChildren.get(x)));
+				result += toString(diskRead(curr.offsetOfChildren.get(x)));		
 			} 
 			return result;
 	}
