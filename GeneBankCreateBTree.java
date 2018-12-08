@@ -61,7 +61,12 @@ public class GeneBankCreateBTree {
 				throw new IllegalArgumentException();
 			}
 			retVal.cache = Integer.parseInt(args[0]) == 1;
-			retVal.degree = Integer.parseInt(args[1]);
+			
+			if(Integer.parseInt(args[1]) == 0){
+				retVal.degree = 51;
+			}else{
+				retVal.degree = Integer.parseInt(args[1]);
+			}
 			retVal.fileName = args[2];
 			retVal.sequence = Integer.parseInt(args[3]);
 			if (retVal.cache)	{

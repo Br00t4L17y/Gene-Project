@@ -27,7 +27,7 @@ public class TreeObject implements Serializable {
 			}
 		}
 
-		key = Long.parseLong(binaryVal);
+		key = Long.parseLong(binaryVal, 2);
 
 	}
 
