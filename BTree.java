@@ -332,7 +332,7 @@ public class BTree implements Serializable{
 				} 
 			}
 			if (!curr.isLeaf()){
-				result += toString(currChild);
+				result += toString(diskRead(curr.offsetOfChildren.get(x)));
 			} 
 			return result;
 	}
