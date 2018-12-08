@@ -8,59 +8,44 @@ import java.io.FileNotFoundException;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.io.Serializable;
 
-public class BTree implements Serializable {
-	private static final long serialVersionUID = -7504766932017737111L;
 
-    int t; // minimum degree 
+public class BTree implements Serializable{
+	int t; // minimum degree 
     BTreeNode root;
     ArrayList<BTreeNode> nodes;
-    int nodeSize = 4096;   // hardcoded this in; if we have time we may want to calculate the exact value to save space
+    int nodeSize;   //Calculated based off t
     int nextPosition; 
-    
     String bFile;
+    static RandomAccessFile metaData;
+    static RandomAccessFile bTreeOut;
+    
 
 	public BTree(int degree, String gbkFile, int seqLength) throws IOException, ClassNotFoundException {
 		t = degree;
+		nodeSize = 100000; //(68*t + 600 + 200);
 		nextPosition = 0;
 		bFile = gbkFile.substring(1) + ".btree.data." + seqLength + "." + t; 
-		//nodeSize = (256 * t) - 88; 
-		root = new BTreeNode(true, t, 0);
-		//diskWrite(0, root); 
+		metaData = new RandomAccessFile("metadata.bin", "rw");
+		bTreeOut = new RandomAccessFile(bFile, "rw");
+		root = new BTreeNode(true, t, nextPosition);
+		diskWrite(0, root); 
 		
-		//System.out.println(diskRead(0));
-		
-		/*String[] letters = {"C", "A", "G"}; 
-		for (int i = 0; i < 3; i++) {
-			TreeObject to = new TreeObject(letters[i]); 
-			add(to); 
-		}
-		
-		
-		
-		
-		
-
-		System.out.println("Root Node: " + diskRead(0).values.get(0).toString());*/
 		
 		// Should probably close these files VVV
-
-		 try {
-			 RandomAccessFile bTreeFile = new RandomAccessFile(bFile, "rw"); 
-			 
-             RandomAccessFile out = new RandomAccessFile("metadata.bin", "rw");
-             FileChannel fout = out.getChannel();
+		// filling metaData with metaData
+		 try {			 
+             FileChannel fout = metaData.getChannel();
              fout.truncate(0); // truncate the file
 
-
-     		int rootPosition = 0; 
-     		int numChildren = 0; 
+     		 int rootPosition = 0; 
+     		 int numChildren = 0; 
              
              ByteBuffer buff = ByteBuffer.allocateDirect(32 * 3);
              
@@ -92,83 +77,44 @@ public class BTree implements Serializable {
 	}
 	
 	private void diskWrite(int pos, BTreeNode node) {
+
+		byte[] b = serialize(node); 
+		
 		try {
-			RandomAccessFile out = new RandomAccessFile(bFile, "rw"); 
-			 
-            FileChannel fout = out.getChannel();
-            fout.truncate(0); // truncate the file
-            
-            ByteBuffer buff = ByteBuffer.allocateDirect(nodeSize);
-            System.out.println("Node size: " + nodeSize);
-            byte[] serializedNode = toStream(node); 
-
-            System.out.println("The size of the object is: " + serializedNode.length);
-            byte[] fullSerializedNode = new byte[nodeSize]; 
-            int i; 
-            for (i = 0; i < serializedNode.length; i++) {
-            	fullSerializedNode[i] = serializedNode[i]; 
-            }
-
-            buff.put(fullSerializedNode, 0, nodeSize); 
-            fout.position(pos);
-            
-            if (!buff.hasRemaining()) {
-                buff.flip();
-                fout.write(buff);
-                buff.clear();
-            }
-            
-            if (buff.position() > 0) {
-                buff.flip();
-                fout.write(buff);
-                buff.clear();
-            }	
-            
-            fout.close();
-
-		 } catch (IOException e) {
-            System.err.println(e);
-            System.exit(1);
-
-		 }
+		bTreeOut.seek(pos);
+		bTreeOut.write(b);
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	private BTreeNode diskRead(int pos) {
 
+		byte[] b = new byte[nodeSize];
 		BTreeNode result = null;
-
-		try{
-			ByteBuffer buffer = ByteBuffer.allocateDirect(nodeSize);
-
-			FileChannel dataFile = new RandomAccessFile(bFile,"rw").getChannel();
-
-			dataFile.position(pos);
-			buffer.clear();
-			dataFile.read(buffer);
-			buffer.flip();
 		
-			byte[] data = new byte[nodeSize]; 
-			buffer.get(data);
+		try {
+			bTreeOut.seek(pos);
+			bTreeOut.read(b);
+			result = deserialize(b);
 			
-			ByteArrayInputStream in = new ByteArrayInputStream(data);
-			ObjectInputStream is = new ObjectInputStream(in);
-			
-			result = (BTreeNode)is.readObject();
-		}
-
-		catch(IOException e){
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		catch(ClassNotFoundException e){
-			e.printStackTrace();
+		catch(ClassNotFoundException cnfe){
+			cnfe.printStackTrace();
 		}
-
+		
+		
 		return result;
+		
 	}
 	
-	public static byte[] toStream(BTreeNode node) {
-	    byte[] stream = null;
+	private byte[] serialize(BTreeNode node) {
+		byte[] stream = null;
 	    try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	            ObjectOutputStream oos = new ObjectOutputStream(baos);) {
 	        oos.writeObject(node);
@@ -178,6 +124,15 @@ public class BTree implements Serializable {
 	    }
 	    return stream;
 	}
+	
+	private BTreeNode deserialize(byte[] b) throws ClassNotFoundException, IOException {
+		
+		ByteArrayInputStream in = new ByteArrayInputStream(b);
+		ObjectInputStream is = new ObjectInputStream(in);
+		
+		return (BTreeNode)is.readObject();
+	}
+
 	
     private void split(BTreeNode parent, int i) {
 		// create new right node and get reference to the node to be split 
@@ -204,9 +159,7 @@ public class BTree implements Serializable {
 		
 		//Writing all updated nodes to disk at their proper positions
 		diskWrite(leftNode.getOffset(), leftNode);
-
 		diskWrite(parent.getOffset(), parent);
-		
 		diskWrite(rightNode.getOffset(), rightNode);
 		
 		
@@ -217,7 +170,7 @@ public class BTree implements Serializable {
     	if(root.values.size() == 0) {
 			root.values.add(0, element);
 			element.incFrequency(); 
-			//diskWrite(root.getOffset(), root);
+			diskWrite(root.getOffset(), root);
     	}
     	
     	// BTree is not empty
@@ -246,10 +199,14 @@ public class BTree implements Serializable {
      * @throws IOException 
      */
     private void insertNonFull(BTreeNode node, TreeObject element) throws IOException {
+    	if (element.getSeq().equals("CGCAAA")) {
+    		System.out.println("HELP"); 
+    	}
     	int i = node.values.size() - 1; // the last key in values
     	
     	if(i >= 0 && element.compareTo(node.values.get(i)) == 0) {
     		node.values.get(i).incFrequency();
+    		diskWrite(node.offset,node);
     		return;
     	}
     	
@@ -259,12 +216,14 @@ public class BTree implements Serializable {
 			
 			if(i >= 0 && node.values.get(i).compareTo(element) == 0) {
 				node.values.get(i).incFrequency();
+				diskWrite(node.offset,node);
 				return;
 			}
 		}
     	
     	if(i==0 && element.compareTo(node.values.get(i)) == 0) {
     		node.values.get(i).incFrequency();
+    		diskWrite(node.offset,node);
 			return;
     	}
     	
@@ -362,8 +321,11 @@ public class BTree implements Serializable {
 			BTreeNode currChild = null;
 			for (x = 0; x < curr.values.size(); x++) 
 			{
-				currChild = diskRead(curr.offsetOfChildren.get(x));
+				System.out.println(curr.offset);
+				System.out.println(curr.offsetOfChildren.size());
+				
 				if (!curr.isLeaf()){
+					currChild = diskRead(curr.offsetOfChildren.get(x));
 					result += toString(currChild) + curr.values.get(x).toString()+ "\n"; 
 				}else{
 					result += curr.values.get(x).toString()+ "\n";
@@ -412,24 +374,17 @@ public class BTree implements Serializable {
 	}*/
     
 
-	public class BTreeNode implements Serializable {
-		private static final long serialVersionUID = -7504766932017737110L; 
-		
+	public class BTreeNode implements Serializable { 
+		private static final long serialVersionUID = 894345046102526781L;
 		boolean leaf;
 		ArrayList<TreeObject> values;
 		ArrayList<Integer> offsetOfChildren;
 		int offset;
-		 
-		
-		public BTreeNode() {
-			values = new ArrayList<TreeObject>(2*BTree.this.t - 1);
-			offsetOfChildren = new ArrayList<Integer>(2*BTree.this.t);
-			offset = 0;
-			leaf = false;
-		}
+		int t;
 
 		public BTreeNode(boolean isLeaf, int t, int offset){
 			this.offset = offset;
+			this.t = t;
 			nextPosition += nodeSize;
 			leaf = isLeaf;
 			values = new ArrayList<TreeObject>(2*t-1);
@@ -437,7 +392,7 @@ public class BTree implements Serializable {
 		}
 		
 		public boolean isFull() {
-			return values.size() == 2*t-1;
+			return values.size() == 2*this.t-1;
 		}
 
 		public void setOffset(int offset){
