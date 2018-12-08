@@ -51,6 +51,9 @@ public class GeneBankCreateBTree {
 			tree.printToFile();
 		} 
 
+		// writes MetadData to the metaData RandomAccessFile 
+		tree.writeMetaData();
+
 	}
 
 	private static CreateArguments AssignArguments(String[] args) {

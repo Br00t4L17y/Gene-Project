@@ -64,8 +64,6 @@ public class BTree implements Serializable{
                  fout.write(buff);
                  buff.clear();
              }	
-             
-             fout.close();
 
 		 } catch (IOException e) {
              System.err.println(e);
@@ -257,7 +255,10 @@ public class BTree implements Serializable{
     	
     	}
     }
-    
+	
+	// Search is incomplete but this is the start of the books sudo-code
+	// Should be able to finish, use read when it reads in the book use diskRead(node.getOffset()) to retrieve
+	// the node you need to find. May want to change parameters to deal with TreeObjects?? or Sequences?
     public TreeObject search(BTreeNode node, long key) {
     	int i = 0;
     	
@@ -269,7 +270,47 @@ public class BTree implements Serializable{
     		
 		}
 		return null;
-    }
+	}
+	
+    
+	/**
+	 * Call when finished writing to BTree
+	 * Writes metaData to metaData files and closes both RandomAccessFiles
+	 */
+	public void writeMetaData(){
+		try {			 
+			FileChannel fout = metaData.getChannel();
+			fout.truncate(0); // truncate the file 
+			
+			ByteBuffer buff = ByteBuffer.allocateDirect(32 * 3);
+			
+			buff.putInt(root.getOffset());
+			buff.putInt(t); 
+			//buff.putInt(numChildren); // Currently don't need but we can add if necessary
+			
+			if (!buff.hasRemaining()) {
+				buff.flip();
+				fout.write(buff);
+				buff.clear();
+			}
+			
+			if (buff.position() > 0) {
+				buff.flip();
+				fout.write(buff);
+				buff.clear();
+			}	
+			
+			fout.close();
+			bTreeOut.close();
+			metaData.close();
+
+		} catch (IOException e) {
+			System.err.println(e);
+			System.exit(1);
+
+		}
+
+   }
     
 
 	public void printToFile() {
