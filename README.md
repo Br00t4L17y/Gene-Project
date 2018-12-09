@@ -35,7 +35,7 @@ COMPILING AND RUNNING:
  $ java GeneBankCreateBTree <0/1(no/with cache)> <degree> <gbkFile> <sequenceLength> [<cacheSize>] [<debugLevel>]
 
  where:
-  * 0/1(no/with cache): //TODO: Description
+    * 0/1(no/with cache): //TODO: Description
 	* degree: Specifies the degree of the BTree
 	* gbkFile: Specifies the DNA file that will be parsed to create the TreeObjects
 	* sequenceLength: Determines the length of each DNA sequence (must be between 1 and 31)
@@ -55,7 +55,7 @@ COMPILING AND RUNNING:
  $ java GeneBankSearch <0/1(no/with cache)> <btreeFile> <queryFile> [<cacheSize>] [<debugLevel>]
 
  where:
-  * 0/1(no/with cache): //TODO: Description
+    * 0/1(no/with cache): //TODO: Description
 	* btreeFile: This is a binary BTree file created by GeneBankCreateBTree
 	* queryFile: Contains sequences to search for in the BTree
 	* cacheSize: optional argument. Specifies the size of the cache if one is being used
@@ -66,34 +66,83 @@ COMPILING AND RUNNING:
 
 PROGRAM DESIGN AND IMPORTANT CONCEPTS:
 
- The most important concept of this program, is that it implements a hash table structure. This structure ensures that no duplicate items are inserted into the table,
- and quickly finds an open spot if the hashed index is already in use.
+ For this project, we need to write to and read from a binary file. This file is 
+ responsible for holding our BTree structure as it is too big to be stored in 
+ memory. 
 
- This program inserts into an array based on a load factor. The hash table insert works as follows:
-	1. A hash function is run on the first input value, which returns a valid table index.
-	2. It tries to do an insert at that index.	
-	3. It checks if the array has a value at that index, inserting the value if it is empty.
-	4. If there is a value at that array index, it checks to see if the potential value is the same as the existing value.
-	5. If the values are the same, it does not insert the potential value.
-	6. If the values are not the same, a secondary hash function is run on the hashcode to get a new index value to insert at.
+  ***LAYOUT OF B-TREE FILE***
+  When we write to the BTree file, we are serializing each BTreeNode and then 
+  writing that array of bytes to the file. Similarly, when we read from the file,
+  we deserialize the data so that we can get the BTreeNode back. Bassed off the 
+  way we have structured it, The nodes do no move in the file. Instead, the 
+  nodes just get updated when information changes. We also have a metadata file 
+  that holds offset of the root and some other important information about the 
+  tree.
+
+  Other important concepts include the BTree structure along with its important 
+  methods such as insert and search. We also made many other methods that helped 
+  us accomplish insert and search. These included methods to read and write from 
+  disk, serialize and deserialize our BTreeNode objects, and other methods to 
+  store and retrieve variables.
 
 
 TESTING:
 
- //TODO: Testing Methods/Test Cases
+ When we first started, testing for each of consisted of making a main method 
+ for what we were working on so that we could test the functionality of our 
+ sections. Once we brought everything together for the first time, we were able 
+ to tweak and debug righ in the project. When it came to the issue of writing to 
+ and reading from disk, we had to create a simple case outside the project in 
+ order to test and debug the process. We did it this way because it was hard to 
+ keep track of what everything was doing inside the depths of the project. Once 
+ we got everything to work correctly on our smaller example, we then implemented 
+ it into the overall project. This method of testing worked well because we only 
+ had to look at code that was relevant to the issue we were trying to solve.
 
  //TODO: Areas of Improvement
 
- //TODO: Known Bugs
+ Known bugs:
+	- We have to reserve a larger amount of diskspace for each node then we would like to
 
 
 DISCUSSION:
  
- Our process proved to be very effective. We got everyone setup with GitHub so that we could make a project repository to all work on. A couple of us had never used Git before so there was a little quick learning that needed to be done so that we could all be on the same page. After getting Git all setup we sat down together to plan out the sections of the project and their priority. We originally decided on a 3-phase, 3-week process. Week 1 was going to be dedicated to everything we needed to read in the GeneBank file and create the BTree. Week 2 was going to be for Writing everything that had to do with Searching the BTree. Week 3 was then set to be debugging and working out any final issues. We split the tasks for phase 1 up amongst the 4 of us and then went to Thanksgiving break. Our next meeting was the final Sunday of Thanksgiving break. We got together to discuss what we had done. Debugging was mandatory as not everything was working together the right way. We worked through those issues and realized that we forgot to implement the debug option and writing to a binary file. We spent week 2 fixing issues adding and splitting, adding argument handling, implementing debug level, and trying the figure out how to writie the BTree to a binary file. The binary file created the most issues for us in this project. We spent a long time trying to figure out the concept and the implementation of it.  
+ Our process proved to be very effective. We got everyone setup with GitHub so
+  that we could make a project repository to all work on. A couple of us had 
+  never used Git before so there was a little quick learning that needed to be
+   done so that we could all be on the same page. After getting Git all setup we 
+   sat down together to plan out the sections of the project and their priority. 
+   We originally decided on a 3-phase, 3-week process. Week 1 was going to be 
+   dedicated to everything we needed to read in the GeneBank file and create the 
+   BTree. Week 2 was going to be for Writing everything that had to do with 
+   Searching the BTree. Week 3 was then set to be debugging and working out any 
+   final issues. We split the tasks for phase 1 up amongst the 4 of us and then 
+   went to Thanksgiving break. Our next meeting was the final Sunday of 
+   Thanksgiving break. We got together to discuss what we had done. Debugging 
+   was mandatory as not everything was working together the right way. We worked 
+   through those issues and realized that we forgot to implement the debug 
+   option and writing to a binary file. We spent week 2 fixing issues adding and 
+   splitting, adding argument handling, implementing debug level, and trying the 
+   figure out how to writie the BTree to a binary file. The binary file created 
+   the most issues for us in this project. We spent a long time trying to figure 
+   out the concept and the implementation of it. Once we figured this out, we 
+   were able to go ahead and  write the search method that retrieves the 
+   BTreeNode objects from the binary file and reports its sequence and frequency 
+   to the console.
 
- //TODO: Breakthroughs/Eurika Moments
+ There were definately a few breakthrough moments for us. The biggest 
+ breakthrough was understanding why we needed to write to a binary file and then 
+ read the information back in. We spent a long time trying to figure out why we 
+ needed to do this. We also experienced a breakthrough moment when we learned 
+ how RandomAccessFile and serialization work. This was a huge help for us 
+ because we were then able to implement that process for writing and reading 
+ from the binary file.
 
- The concepts that we have learned throughout the course of this project have been really great to learn. I think
+ The concepts that we have learned throughout the course of this project have 
+ been really great to learn. I think it would have been nice to spend a little 
+ time talking about how to read and write to files along with why it is 
+ necessary to do so. I think that spending some time with this concept in class 
+ would make it easier to work through for this project.
 
  
 EXTRA CREDIT:
