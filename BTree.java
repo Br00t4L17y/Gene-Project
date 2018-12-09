@@ -197,9 +197,9 @@ public class BTree implements Serializable{
      * @throws IOException 
      */
     private void insertNonFull(BTreeNode node, TreeObject element) throws IOException {
-    	if (element.getSeq().equals("CGCAAA")) {
-    		System.out.println("HELP"); 
-    	}
+    	// if (element.getSeq().equals("CGCAAA")) {
+    	// 	System.out.println("HELP"); 
+    	// }
     	int i = node.values.size() - 1; // the last key in values
     	
     	if(i >= 0 && element.compareTo(node.values.get(i)) == 0) {
@@ -334,14 +334,8 @@ public class BTree implements Serializable{
 			FileWriter fileWriter = new FileWriter(output);
 			PrintWriter printWriter = new PrintWriter(fileWriter);
 			
-			/* Put the logic for the inorder traveral here */
-
-			printWriter.println(toString());	
-			// for(int i = 0; i < tableSize; i++) {
-			// 	if(table[i] != null) {
-			// 		printWriter.println("table[" + i + "]: " + table[i].toString());
-			// 	}
-			// }
+			printWriter.println(toString());  //toString does inorder traversal	
+			
 			printWriter.close();
 			fileWriter.close();
 			
@@ -362,10 +356,7 @@ public class BTree implements Serializable{
 			int x;
 			BTreeNode currChild = null;
 			for (x = 0; x < curr.values.size(); x++) 
-			{
-				//System.out.println(curr.offset);
-				//System.out.println(curr.offsetOfChildren.size());
-				
+			{	
 				if (!curr.isLeaf()){
 					currChild = diskRead(curr.offsetOfChildren.get(x));
 					result += toString(currChild) + curr.values.get(x).toString()+ "\n"; 
@@ -379,42 +370,6 @@ public class BTree implements Serializable{
 			return result;
 	}
 	
-	// levelorder 
-/*	public String toString(BTreeNode curr){
-		if(curr == null) return "";
-			String result = "";
-			int x;
-			for (x = 0; x < curr.values.size(); x++) 
-			{
-				result += curr.values.get(x) + "\n"; 
-				
-			}
-			if (!curr.isLeaf() || curr.children.size() == 0) {
-
-				if (curr.children.size() != 0 && curr.children.size() < 2 * t) {
-					for (int i = curr.children.size(); i < 2 * t; i++) {
-						BTreeNode newNode = new BTreeNode(true, t); 
-						if (!curr.children.get(0).isLeaf()) {
-							newNode.setLeaf(false);
-						}
-						
-						
-						curr.children.add(newNode);
-					}
-				}
-				if (curr.children.size() == 0) {
-					result += "BLANK\n";
-				}
-				for (x = 0; x < curr.children.size(); x++) 
-				{
-					result += toString(curr.children.get(x)); 
-					
-				}
-			}
-			
-			return result;
-	}*/
-    
 
 	public class BTreeNode implements Serializable { 
 		private static final long serialVersionUID = 894345046102526781L;
