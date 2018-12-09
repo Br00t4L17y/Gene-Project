@@ -36,7 +36,7 @@ public class GeneBankSearch {
 
 			for (int i = 0; i < queryLookups.size(); i++) {
 				String sequence = queryLookups.get(i);
-				System.out.println(queryLookups.get(i));
+				//System.out.println(queryLookups.get(i));
 				TreeObject treeObject = new TreeObject(sequence);
 				TreeObject result = Search(rootPosition, arguments.btreeFileName, treeObject);
 				
@@ -59,8 +59,8 @@ public class GeneBankSearch {
 		int position;
 		
 		Path relativePath = Paths.get("");
-		String filePath = relativePath.toAbsolutePath().toString() + "metadata.bin";
-		RandomAccessFile file = new RandomAccessFile(filePath, "r");
+		String filePath = relativePath.toAbsolutePath().toString() + "/metadata.bin";
+		RandomAccessFile file = new RandomAccessFile("metadata.bin", "r");
 
 		file.seek(0);
 		position = file.readInt();
@@ -74,6 +74,8 @@ public class GeneBankSearch {
 // Should be able to finish, use read when it reads in the book use diskRead(node.getOffset()) to retrieve
 // the node you need to find. May want to change parameters to deal with TreeObjects?? or Sequences?
 private static TreeObject Search(int rootPosition, String btreeFileName, TreeObject treeObject) throws FileNotFoundException {
+	// System.out.println(btreeFileName);
+	// System.out.println();
 	RandomAccessFile accessFile = new RandomAccessFile(btreeFileName, "r");
 	BTreeNode node = diskRead(rootPosition, accessFile);
 	Long key = treeObject.getKey();
