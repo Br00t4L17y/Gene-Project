@@ -1,9 +1,12 @@
+import java.io.ByteArrayInputStream;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
+
+
 import java.util.List;
 import java.util.ArrayList;
 import java.lang.Enum;
@@ -11,7 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-
+import java.io.RandomAccessFile;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -22,29 +25,110 @@ import java.io.ObjectOutputStream;
 
 public class GeneBankSearch {
 	public static void main(String args[]) {
-		System.out.print("Search program started.");
+		//System.out.print("Search program started.");
 
 		SearchArguments arguments = AssignArguments(args);
 
-		List<String> querySequences = BuildStringFromFile(arguments.queryFileName);
-		
-		for (int i = 0; i < querySequences.size(); i++) {
-			String sequence = querySequences.get(i);
-			System.out.println(querySequences.get(i));
-			// TreeObject treeObject = new TreeObject(sequence);
-			// TreeObject result = GeneBankCreateBTree.search(arguments.btreeFileName, treeObject);
-			
-			// if(result == null){
-			// 	System.out.println(querySequences.get(i) + ": 0" );
-			// }else{
-			// 	System.out.println(result.toString());
-			// }
-			
+		List<String> queryLookups = BuildListFromFile(arguments.queryFileName);
 
+		try {
+			int rootPosition = GetTreeMetadata();
+			
+			RandomAccessFile accessFile = new RandomAccessFile(arguments.btreeFileName, "r");
+
+			for (int i = 0; i < queryLookups.size(); i++) {
+				String sequence = queryLookups.get(i);
+				//System.out.println(queryLookups.get(i));
+				TreeObject treeObject = new TreeObject(sequence);
+				TreeObject result = Search(rootPosition, accessFile, treeObject);
+				
+				if(result == null) {
+					//System.out.println(queryLookups.get(i) + ": 0" );
+				}
+				else {
+					System.out.println(result.toString());
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException io) {
+			io.printStackTrace();
 		}
 	}
 
-	private static SearchArguments AssignArguments(String[] args) {
+
+	private static int GetTreeMetadata() throws FileNotFoundException, IOException {
+		int position;
+		
+		Path relativePath = Paths.get("");
+		String filePath = relativePath.toAbsolutePath().toString() + "/metadata.bin";
+		RandomAccessFile file = new RandomAccessFile(filePath, "r");
+
+		file.seek(0);
+		position = file.readInt();
+		file.close();
+
+		return position;
+	}	
+
+
+// Search is incomplete but this is the start of the books sudo-code
+// Should be able to finish, use read when it reads in the book use diskRead(node.getOffset()) to retrieve
+// the node you need to find. May want to change parameters to deal with TreeObjects?? or Sequences?
+private static TreeObject Search(int rootPosition, RandomAccessFile accessFile, TreeObject treeObject) throws FileNotFoundException {
+	
+	BTreeNode node = diskRead(rootPosition, accessFile);
+
+	return Search(node, treeObject, accessFile);
+}
+
+private static TreeObject Search(BTreeNode node, TreeObject treeObj, RandomAccessFile accessFile) {
+	int i = 0;
+	
+	while(i < node.values.size() && node.values.get(i).compareTo(treeObj) < 0) {
+		i++;
+	}
+
+	if(i < node.values.size() && node.values.get(i).compareTo(treeObj) == 0) {
+		return node.values.get(i);
+	}
+	else if(node.isLeaf()) {
+		return null;
+	}
+	else {
+		BTreeNode n = diskRead(node.offsetOfChildren.get(i), accessFile);
+		return Search(n, treeObj, accessFile);
+	}
+}
+
+private static BTreeNode diskRead(int position, RandomAccessFile file) {
+	byte[] b = new byte[10000];
+	BTreeNode result = null;
+	
+	try {
+		file.seek(position);
+		file.read(b);
+		result = deserialize(b);
+		
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+	catch(ClassNotFoundException cnfe){
+		cnfe.printStackTrace();
+	}
+	
+	return result;	
+}
+
+private static BTreeNode deserialize(byte[] b) throws ClassNotFoundException, IOException {
+		
+	ByteArrayInputStream in = new ByteArrayInputStream(b);
+	ObjectInputStream is = new ObjectInputStream(in);
+	
+	return (BTreeNode)is.readObject();
+}
+
+private static SearchArguments AssignArguments(String[] args) {
 		SearchArguments retVal = new SearchArguments();
 		
 		try {
@@ -74,8 +158,7 @@ public class GeneBankSearch {
 		return retVal;
 	}
 
-	private static List<String> BuildStringFromFile(String fileName) {
-
+	private static List<String> BuildListFromFile(String fileName) {
 		Path relativePath = Paths.get("");
 		String filePath = relativePath.toAbsolutePath().toString() + fileName;
 
