@@ -35,6 +35,8 @@ public class BTree implements Serializable{
 		metaData = new RandomAccessFile("metadata.bin", "rw");
 		bTreeOut = new RandomAccessFile(bFile, "rw");
 		root = new BTreeNode(true, t, nextPosition);
+		nextPosition += nodeSize;
+
 		diskWrite(0, root); 
 		
 		
@@ -132,9 +134,11 @@ public class BTree implements Serializable{
 	}
 
 	
-    private void split(BTreeNode parent, int i) {
+	private void split(BTreeNode parent, int i) {
 		// create new right node and get reference to the node to be split 
 		BTreeNode rightNode = new BTreeNode(true, t, nextPosition);
+		nextPosition += nodeSize;
+
 		BTreeNode leftNode = diskRead(parent.offsetOfChildren.get(i)); 
 		rightNode.leaf = leftNode.leaf; 
 		
@@ -163,53 +167,54 @@ public class BTree implements Serializable{
 		
 	} 
     
-    public void add(TreeObject element) throws IOException {    	
-    	// if BTree is empty
-    	if(root.values.size() == 0) {
+	public void add(TreeObject element) throws IOException {    	
+		// if BTree is empty
+		if(root.values.size() == 0) {
 			root.values.add(0, element);
 			element.incFrequency(); 
 			diskWrite(root.getOffset(), root);
-    	}
-    	
-    	// BTree is not empty
-    	else {
-    		
-    		// if root is full --> need to create new node and
-    		if(root.isFull()) {
-        		BTreeNode newRoot = new BTreeNode(false, t, nextPosition); // make a new node
-        		newRoot.offsetOfChildren.add(0, root.getOffset()); 
-        		split(newRoot, 0); //Splits the child
-        		insertNonFull(newRoot, element); 	
-        		root = newRoot;
-        	}
-        	// if root is not full
-        	else {
-        		insertNonFull(root, element);
-        	}
-    	}    	
-    }
+		}
+		
+		// BTree is not empty
+		else {
+			
+			// if root is full --> need to create new node and
+			if(root.isFull()) {
+					BTreeNode newRoot = new BTreeNode(false, t, nextPosition); // make a new node
+					nextPosition += nodeSize;
+					newRoot.offsetOfChildren.add(0, root.getOffset()); 
+					split(newRoot, 0); //Splits the child
+					insertNonFull(newRoot, element); 	
+					root = newRoot;
+			}
+				// if root is not full
+			else {
+				insertNonFull(root, element);
+			}
+		}    	
+	}
     
 
-    /**
-     * Inserting helper method, although this method does the real job of locating the place to insert and inserting. 
-     * @param node
-     * @param element
-     * @throws IOException 
-     */
-    private void insertNonFull(BTreeNode node, TreeObject element) throws IOException {
-    	// if (element.getSeq().equals("CGCAAA")) {
-    	// 	System.out.println("HELP"); 
-    	// }
-    	int i = node.values.size() - 1; // the last key in values
-    	
-    	if(i >= 0 && element.compareTo(node.values.get(i)) == 0) {
-    		node.values.get(i).incFrequency();
-    		diskWrite(node.getOffset(),node);
-    		return;
-    	}
-    	
-    	// Determine correct index to insert at 
-    	while(i >= 0 && element.compareTo(node.values.get(i)) < 0) {
+	/**
+	 * Inserting helper method, although this method does the real job of locating the place to insert and inserting. 
+	 * @param node
+	 * @param element
+	 * @throws IOException 
+	 */
+	private void insertNonFull(BTreeNode node, TreeObject element) throws IOException {
+		// if (element.getSeq().equals("CGCAAA")) {
+		// 	System.out.println("HELP"); 
+		// }
+		int i = node.values.size() - 1; // the last key in values
+		
+		if(i >= 0 && element.compareTo(node.values.get(i)) == 0) {
+			node.values.get(i).incFrequency();
+			diskWrite(node.getOffset(),node);
+			return;
+		}
+		
+		// Determine correct index to insert at 
+		while(i >= 0 && element.compareTo(node.values.get(i)) < 0) {
 			i--;
 			
 			if(i >= 0 && node.values.get(i).compareTo(element) == 0) {
@@ -218,61 +223,44 @@ public class BTree implements Serializable{
 				return;
 			}
 		}
-    	
-    	if(i==0 && element.compareTo(node.values.get(i)) == 0) {
-    		node.values.get(i).incFrequency();
-    		diskWrite(node.getOffset(),node);
+		
+		if(i==0 && element.compareTo(node.values.get(i)) == 0) {
+			node.values.get(i).incFrequency();
+			diskWrite(node.getOffset(),node);
 			return;
-    	}
-    	
-    	i++;
-    	
-    	
-    	// if node is a leaf then we can insert 
-    	if(node.isLeaf()) {
+		}
+		
+		i++;
+		
+		
+		// if node is a leaf then we can insert 
+		if(node.isLeaf()) {
 			node.values.add(i, element);
 			element.incFrequency();
 			// replace node in binary file with updated node
 			diskWrite(node.getOffset(), node);
-    	}
-    	
-    	// if node is not a leaf then we cannot insert and we need to determine the correct child to descend the tree
-    	else {   		
+		}
+		
+		// if node is not a leaf then we cannot insert and we need to determine the correct child to descend the tree
+		else {   		
 			// if child is full
-		BTreeNode childNode = diskRead(node.offsetOfChildren.get(i));
-    		if(childNode.isFull()) { 
+			BTreeNode childNode = diskRead(node.offsetOfChildren.get(i));
+			if(childNode.isFull()) { 
 				if (childNode.values.get(t-1).compareTo(element) == 0) {
 					childNode.values.get(t-1).incFrequency();
 					diskWrite(childNode.getOffset(), childNode);
 					return; 
 				}
-    			split(node, i); // split in the book uses index i
-    			if(element.compareTo(node.values.get(i)) > 0)
-    				i++;
-    		}
-    		
-    	insertNonFull(diskRead(node.offsetOfChildren.get(i)), element);
-    	
-    	}
-    }
-	
-	// Search is incomplete but this is the start of the books sudo-code
-	// Should be able to finish, use read when it reads in the book use diskRead(node.getOffset()) to retrieve
-	// the node you need to find. May want to change parameters to deal with TreeObjects?? or Sequences?
-    public TreeObject search(BTreeNode node, long key) {
-    	int i = 0;
-    	
-    	while(i < node.values.size() && key > node.values.get(i).getKey()) {
-    		i++;
-    	}
-    	
-    	if(i < node.values.size() && key == node.values.get(i).getKey()) {
-    		
+				split(node, i); // split in the book uses index i
+				if(element.compareTo(node.values.get(i)) > 0)
+					i++;
+			}
+			
+			insertNonFull(diskRead(node.offsetOfChildren.get(i)), element);		
 		}
-		return null;
 	}
 	
-    
+  
 	/**
 	 * Call when finished writing to BTree
 	 * Writes metaData to metaData files and closes both RandomAccessFiles
@@ -310,11 +298,10 @@ public class BTree implements Serializable{
 
 		}
 
-   }
+	}
     
-
 	public void printToFile() {
-		try{
+		try {
 			Path current = Paths.get("");
 			String filePath = current.toAbsolutePath().toString();
 			
@@ -327,7 +314,8 @@ public class BTree implements Serializable{
 			if(output.exists()) {
 				PrintWriter writer = new PrintWriter(filePath);
 				writer.close();
-			}else {
+			} 
+			else {
 				output.createNewFile();
 			}
 			
@@ -340,7 +328,8 @@ public class BTree implements Serializable{
 			fileWriter.close();
 			
 			
-		}catch(Exception e) {
+		}
+		catch(Exception e) {
 			e.printStackTrace();
 		}	
 	}
@@ -370,43 +359,41 @@ public class BTree implements Serializable{
 			return result;
 	}
 	
+}	
+class BTreeNode implements Serializable { 
+	private static final long serialVersionUID = 894345046102526781L;
+	boolean leaf;
+	ArrayList<TreeObject> values;
+	ArrayList<Integer> offsetOfChildren;
+	int offset;
+	int t;
 
-	public class BTreeNode implements Serializable { 
-		private static final long serialVersionUID = 894345046102526781L;
-		boolean leaf;
-		ArrayList<TreeObject> values;
-		ArrayList<Integer> offsetOfChildren;
-		int offset;
-		int t;
-
-		public BTreeNode(boolean isLeaf, int t, int offset){
-			this.offset = offset;
-			this.t = t;
-			nextPosition += nodeSize;
-			leaf = isLeaf;
-			values = new ArrayList<TreeObject>(2*t-1);
-			offsetOfChildren = new ArrayList<Integer>(2*t);
-		}
-		
-		public boolean isFull() {
-			return values.size() == 2*this.t-1;
-		}
-
-		public void setOffset(int offset){
-			this.offset = offset;
-		}
-
-		public int getOffset(){
-			return offset;
-		}				
-		
-		public boolean isLeaf(){
-			return this.leaf;
-		}
-		
-		public void setLeaf(boolean b) {
-			this.leaf = b;
-		}
+	public BTreeNode(boolean isLeaf, int t, int offset) {
+		this.offset = offset;
+		this.t = t;
+		//nextPosition += 10000;
+		leaf = isLeaf;
+		values = new ArrayList<TreeObject>(2*t-1);
+		offsetOfChildren = new ArrayList<Integer>(2*t);
+	}
+	
+	public boolean isFull() {
+		return values.size() == 2*this.t-1;
 	}
 
+	public void setOffset(int offset){
+		this.offset = offset;
+	}
+
+	public int getOffset(){
+		return offset;
+	}				
+	
+	public boolean isLeaf(){
+		return this.leaf;
+	}
+	
+	public void setLeaf(boolean b) {
+		this.leaf = b;
+	}
 }
