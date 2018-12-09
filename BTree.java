@@ -35,6 +35,8 @@ public class BTree implements Serializable{
 		metaData = new RandomAccessFile("metadata.bin", "rw");
 		bTreeOut = new RandomAccessFile(bFile, "rw");
 		root = new BTreeNode(true, t, nextPosition);
+		nextPosition += nodeSize;
+
 		diskWrite(0, root); 
 		
 		
@@ -135,6 +137,8 @@ public class BTree implements Serializable{
 	private void split(BTreeNode parent, int i) {
 		// create new right node and get reference to the node to be split 
 		BTreeNode rightNode = new BTreeNode(true, t, nextPosition);
+		nextPosition += nodeSize;
+
 		BTreeNode leftNode = diskRead(parent.offsetOfChildren.get(i)); 
 		rightNode.leaf = leftNode.leaf; 
 		
@@ -177,6 +181,7 @@ public class BTree implements Serializable{
 			// if root is full --> need to create new node and
 			if(root.isFull()) {
 					BTreeNode newRoot = new BTreeNode(false, t, nextPosition); // make a new node
+					nextPosition += nodeSize;
 					newRoot.offsetOfChildren.add(0, root.getOffset()); 
 					split(newRoot, 0); //Splits the child
 					insertNonFull(newRoot, element); 	
@@ -398,43 +403,42 @@ public class BTree implements Serializable{
 			
 			return result;
 	}*/
-    
+}
 
-	public class BTreeNode implements Serializable { 
-		private static final long serialVersionUID = 894345046102526781L;
-		boolean leaf;
-		ArrayList<TreeObject> values;
-		ArrayList<Integer> offsetOfChildren;
-		int offset;
-		int t;
+class BTreeNode implements Serializable { 
+	private static final long serialVersionUID = 894345046102526781L;
+	boolean leaf;
+	ArrayList<TreeObject> values;
+	ArrayList<Integer> offsetOfChildren;
+	int offset;
+	int t;
 
-		public BTreeNode(boolean isLeaf, int t, int offset){
-			this.offset = offset;
-			this.t = t;
-			nextPosition += nodeSize;
-			leaf = isLeaf;
-			values = new ArrayList<TreeObject>(2*t-1);
-			offsetOfChildren = new ArrayList<Integer>(2*t);
-		}
-		
-		public boolean isFull() {
-			return values.size() == 2*this.t-1;
-		}
+	public BTreeNode(boolean isLeaf, int t, int offset) {
+		this.offset = offset;
+		this.t = t;
+		//nextPosition += 10000;
+		leaf = isLeaf;
+		values = new ArrayList<TreeObject>(2*t-1);
+		offsetOfChildren = new ArrayList<Integer>(2*t);
+	}
+	
+	public boolean isFull() {
+		return values.size() == 2*this.t-1;
+	}
 
-		public void setOffset(int offset){
-			this.offset = offset;
-		}
+	public void setOffset(int offset){
+		this.offset = offset;
+	}
 
-		public int getOffset(){
-			return offset;
-		}				
-		
-		public boolean isLeaf(){
-			return this.leaf;
-		}
-		
-		public void setLeaf(boolean b) {
-			this.leaf = b;
-		}
+	public int getOffset(){
+		return offset;
+	}				
+	
+	public boolean isLeaf(){
+		return this.leaf;
+	}
+	
+	public void setLeaf(boolean b) {
+		this.leaf = b;
 	}
 }

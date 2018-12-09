@@ -1,3 +1,4 @@
+import java.io.ByteArrayInputStream;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -5,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
-import BTree.BTreeNode;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -30,51 +30,58 @@ public class GeneBankSearch {
 		SearchArguments arguments = AssignArguments(args);
 
 		List<String> queryLookups = BuildListFromFile(arguments.queryFileName);
-		
-		int rootPosition = GetTreeMetadata();
 
-		for (int i = 0; i < queryLookups.size(); i++) {
-			String sequence = queryLookups.get(i);
-			System.out.println(queryLookups.get(i));
-			TreeObject treeObject = new TreeObject(sequence);
-			TreeObject result = Search(rootPosition, arguments.btreeFileName, treeObject);
-			
-			if(result == null) {
-				System.out.println(queryLookups.get(i) + ": 0" );
+		try {
+			int rootPosition = GetTreeMetadata();
+
+			for (int i = 0; i < queryLookups.size(); i++) {
+				String sequence = queryLookups.get(i);
+				System.out.println(queryLookups.get(i));
+				TreeObject treeObject = new TreeObject(sequence);
+				TreeObject result = Search(rootPosition, arguments.btreeFileName, treeObject);
+				
+				if(result == null) {
+					System.out.println(queryLookups.get(i) + ": 0" );
+				}
+				else {
+					System.out.println(result.toString());
+				}
 			}
-			else {
-				System.out.println(result.toString());
-			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException io) {
+			io.printStackTrace();
 		}
 	}
 
 
-private static GetTreeMetadata() {
-	int position;
-	
-	Path relativePath = Paths.get("");
-	String filePath = relativePath.toAbsolutePath().toString() + "metadata.bin";
-	RandomAccessFile file = new RandomAccessFile(new File(filePath), "r");
+	private static int GetTreeMetadata() throws FileNotFoundException, IOException {
+		int position;
+		
+		Path relativePath = Paths.get("");
+		String filePath = relativePath.toAbsolutePath().toString() + "metadata.bin";
+		RandomAccessFile file = new RandomAccessFile(filePath, "r");
 
-	file.seek(0);
-	position = file.readInt();
+		file.seek(0);
+		position = file.readInt();
+		file.close();
 
-	return position;
-}
+		return position;
+	}	
 
 
 // Search is incomplete but this is the start of the books sudo-code
 // Should be able to finish, use read when it reads in the book use diskRead(node.getOffset()) to retrieve
 // the node you need to find. May want to change parameters to deal with TreeObjects?? or Sequences?
-private static TreeObject Search(int rootPosition, String btreeFileName, TreeObject treeObject) {
-	RandomAccessFile accessFile = new RandomAccessFile(new File(btreeFileName), "r");
+private static TreeObject Search(int rootPosition, String btreeFileName, TreeObject treeObject) throws FileNotFoundException {
+	RandomAccessFile accessFile = new RandomAccessFile(btreeFileName, "r");
 	BTreeNode node = diskRead(rootPosition, accessFile);
 	Long key = treeObject.getKey();
 
-	return Search(node, key);
+	return Search(node, key, accessFile);
 }
 
-private static TreeObject Search(BTreeNode node, Long key) {
+private static TreeObject Search(BTreeNode node, Long key, RandomAccessFile accessFile) {
 	int i = 0;
 	
 	while(i < node.values.size() && key > node.values.get(i).getKey()) {
@@ -89,10 +96,8 @@ private static TreeObject Search(BTreeNode node, Long key) {
 	}
 	else {
 		BTreeNode n = diskRead(node.offsetOfChildren.get(i), accessFile);
-		return Search(n, key);
+		return Search(n, key, accessFile);
 	}
-
-	return node;
 }
 
 private static BTreeNode diskRead(int position, RandomAccessFile file) {
