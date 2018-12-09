@@ -125,7 +125,7 @@ public class GeneBankCreateBTree {
 				else {
 					line = line.replaceAll(" ", "");
 					line = line.replaceAll("\\d", "");
-					sequenceBuilder.append(line.toUpperCase());
+					sequenceBuilder.append(line.toLowerCase());
 				}
 			}
 

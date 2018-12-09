@@ -14,13 +14,13 @@ public class TreeObject implements Serializable {
 		for(int i = 0; i < sequence.length(); i++){
 			char charVal = sequence.charAt(i);
 			
-			if(charVal == 'A'){
+			if(charVal == 'a'){
 				binaryVal += "00";
-			}else if(charVal == 'C'){
+			}else if(charVal == 'c'){
 				binaryVal += "01";
-			}else if(charVal == 'G'){
+			}else if(charVal == 'g'){
 				binaryVal += "10";
-			}else if(charVal == 'T'){
+			}else if(charVal == 't'){
 				binaryVal += "11";
 			}else{
 				break;

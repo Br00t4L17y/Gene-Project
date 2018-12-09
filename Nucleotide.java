@@ -1,6 +1,6 @@
 public enum Nucleotide {
-	A,
-	C,
-	G,
-	T;
+	a,
+	c,
+	g,
+	t;
 }
