@@ -78,6 +78,8 @@ public class GeneBankSearch {
 private static TreeObject Search(int rootPosition, RandomAccessFile accessFile, TreeObject treeObject) throws FileNotFoundException {
 	
 	BTreeNode node = diskRead(rootPosition, accessFile);
+	//System.out.println("Root Node: " + node.values.get(0).toString());
+	//Long key = treeObject.getKey();
 
 	return Search(node, treeObject, accessFile);
 }
@@ -90,6 +92,7 @@ private static TreeObject Search(BTreeNode node, TreeObject treeObj, RandomAcces
 	}
 
 	if(i < node.values.size() && node.values.get(i).compareTo(treeObj) == 0) {
+		//System.out.println(node.values.get(i).toString());
 		return node.values.get(i);
 	}
 	else if(node.isLeaf()) {
@@ -97,6 +100,7 @@ private static TreeObject Search(BTreeNode node, TreeObject treeObj, RandomAcces
 	}
 	else {
 		BTreeNode n = diskRead(node.offsetOfChildren.get(i), accessFile);
+		//System.out.println("Node Recursion: " + n.values.get(i).toString());
 		return Search(n, treeObj, accessFile);
 	}
 }

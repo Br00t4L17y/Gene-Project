@@ -40,7 +40,7 @@ public class GeneBankCreateBTree {
 			if (sequence.length() >= seqLength) {
 				int iterations = sequence.length() - seqLength + 1;
 				for (int j = 0; j < iterations; j++) {
-					System.out.println(sequence.substring(j, seqLength + j));
+					// System.out.println(sequence.substring(j, seqLength + j));
 					TreeObject treeObject = new TreeObject(sequence.substring(j, seqLength + j));
 					tree.add(treeObject);
 				}
@@ -101,6 +101,7 @@ public class GeneBankCreateBTree {
 		Path relativePath = Paths.get("");
 		String filePath = relativePath.toAbsolutePath().toString() + fileName;
 		String plainTextFile = ConvertFileToText(filePath);
+		List<String> allSeq = new ArrayList<String>();
 
 		StringBuilder sequenceBuilder = new StringBuilder();
 
@@ -114,7 +115,12 @@ public class GeneBankCreateBTree {
 					}
 				}
 				else if (line.contains(tailTag)) {
-					continue;
+					List<String> tempSeq = buildSequence(sequenceBuilder);
+					for(int i = 0; i < tempSeq.size(); i++){
+						allSeq.add(tempSeq.get(i));
+					}
+					sequenceBuilder = new StringBuilder();
+					found = false;
 				}
 				else {
 					line = line.replaceAll(" ", "");
@@ -131,7 +137,11 @@ public class GeneBankCreateBTree {
 		File file = new File(plainTextFile);
 		file.delete();
 
-		
+		return allSeq;
+	}
+
+
+	public static List<String> buildSequence(StringBuilder sequenceBuilder) {
 		List<String> sequenceList = new ArrayList<String>();
 		int lastIndex = 0;
 
@@ -153,6 +163,8 @@ public class GeneBankCreateBTree {
 
 		return sequenceList;
 	}
+		
+	
 
 	private static String ConvertFileToText(String filePath) {
 		String outputFileName = filePath + ".txt";
