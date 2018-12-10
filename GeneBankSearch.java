@@ -32,11 +32,12 @@ public class GeneBankSearch {
 
 		try {
 			int rootPosition = GetTreeMetadata();
-			
-			RandomAccessFile accessFile = new RandomAccessFile(arguments.btreeFileName, "r");
+			System.out.println(arguments.btreeFileName);
+			RandomAccessFile accessFile = new RandomAccessFile(new File(arguments.btreeFileName), "r");
 
 			for (int i = 0; i < queryLookups.size(); i++) {
 				String sequence = queryLookups.get(i);
+			    sequence = sequence.toLowerCase();
 				TreeObject treeObject = new TreeObject(sequence);
 				TreeObject result = Search(rootPosition, accessFile, treeObject);
 				
@@ -57,7 +58,7 @@ public class GeneBankSearch {
 		
 		Path relativePath = Paths.get("");
 		String filePath = relativePath.toAbsolutePath().toString() + "/metadata.bin";
-		RandomAccessFile file = new RandomAccessFile(filePath, "r");
+		RandomAccessFile file = new RandomAccessFile(new File(filePath), "r");
 
 		file.seek(0);
 		position = file.readInt();

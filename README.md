@@ -24,6 +24,8 @@ INCLUDED FILES:
 
 COMPILING AND RUNNING:
 
+*** ALL FILEPATHS BEGIN WITH ./ ***
+
  *********
  * Create BTree
  *********
