@@ -31,7 +31,7 @@ public class BTree implements Serializable{
 		t = degree;
 		nodeSize = 10000;
 		nextPosition = 0;
-		bFile = gbkFile + ".btree.data." + seqLength + "." + t; 
+		bFile = gbkFile.substring(1) + ".btree.data." + seqLength + "." + t; 
 		metaData = new RandomAccessFile("metadata.bin", "rw");
 		bTreeOut = new RandomAccessFile(new File(bFile), "rw");
 		root = new BTreeNode(true, t, nextPosition);
