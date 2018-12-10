@@ -29,7 +29,7 @@ public class BTree implements Serializable{
 
 	public BTree(int degree, String gbkFile, int seqLength) throws IOException, ClassNotFoundException {
 		t = degree;
-		nodeSize = 10000;//70*t + 900;
+		nodeSize = 10000;
 		nextPosition = 0;
 		bFile = gbkFile.substring(1) + ".btree.data." + seqLength + "." + t; 
 		metaData = new RandomAccessFile("metadata.bin", "rw");
@@ -101,7 +101,6 @@ public class BTree implements Serializable{
 			result = deserialize(b);
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch(ClassNotFoundException cnfe){
@@ -202,9 +201,7 @@ public class BTree implements Serializable{
 	 * @throws IOException 
 	 */
 	private void insertNonFull(BTreeNode node, TreeObject element) throws IOException {
-		// if (element.getSeq().equals("CGCAAA")) {
-		// 	System.out.println("HELP"); 
-		// }
+
 		int i = node.values.size() - 1; // the last key in values
 		
 		if(i >= 0 && element.compareTo(node.values.get(i)) == 0) {
@@ -274,7 +271,6 @@ public class BTree implements Serializable{
 			
 			buff.putInt(root.getOffset());
 			buff.putInt(t); 
-			//buff.putInt(numChildren); // Currently don't need but we can add if necessary
 			
 			if (!buff.hasRemaining()) {
 				buff.flip();

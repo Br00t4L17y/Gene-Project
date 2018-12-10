@@ -27,9 +27,6 @@ public class GeneBankCreateBTree {
 		CreateArguments arguments = AssignArguments(args);
 		List<String> nucleotideSequences = BuildStringFromFile(arguments.fileName);
 
-		//String binaryFileName = arguments.fileName + ".btree." + arguments.sequence + "." + arguments.degree; 
-		//ObjectOutput out = new ObjectOutputStream(new FileOutputStream("test.ser"));
-
 		BTree tree = new BTree(arguments.degree, arguments.fileName, arguments.sequence);
 	
 		
@@ -40,7 +37,6 @@ public class GeneBankCreateBTree {
 			if (sequence.length() >= seqLength) {
 				int iterations = sequence.length() - seqLength + 1;
 				for (int j = 0; j < iterations; j++) {
-					// System.out.println(sequence.substring(j, seqLength + j));
 					TreeObject treeObject = new TreeObject(sequence.substring(j, seqLength + j));
 					tree.add(treeObject);
 				}

@@ -25,7 +25,6 @@ import java.io.ObjectOutputStream;
 
 public class GeneBankSearch {
 	public static void main(String args[]) {
-		//System.out.print("Search program started.");
 
 		SearchArguments arguments = AssignArguments(args);
 
@@ -38,15 +37,11 @@ public class GeneBankSearch {
 
 			for (int i = 0; i < queryLookups.size(); i++) {
 				String sequence = queryLookups.get(i);
-				//System.out.println(queryLookups.get(i));
 				TreeObject treeObject = new TreeObject(sequence);
 				TreeObject result = Search(rootPosition, accessFile, treeObject);
 				
-				if(result == null) {
-					//System.out.println(queryLookups.get(i) + ": 0" );
-				}
-				else {
-					System.out.println(result.toString());
+				if(result != null) {
+					System.out.println(result.toString());				
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -78,8 +73,6 @@ public class GeneBankSearch {
 private static TreeObject Search(int rootPosition, RandomAccessFile accessFile, TreeObject treeObject) throws FileNotFoundException {
 	
 	BTreeNode node = diskRead(rootPosition, accessFile);
-	//System.out.println("Root Node: " + node.values.get(0).toString());
-	//Long key = treeObject.getKey();
 
 	return Search(node, treeObject, accessFile);
 }
@@ -92,7 +85,6 @@ private static TreeObject Search(BTreeNode node, TreeObject treeObj, RandomAcces
 	}
 
 	if(i < node.values.size() && node.values.get(i).compareTo(treeObj) == 0) {
-		//System.out.println(node.values.get(i).toString());
 		return node.values.get(i);
 	}
 	else if(node.isLeaf()) {
@@ -100,7 +92,6 @@ private static TreeObject Search(BTreeNode node, TreeObject treeObj, RandomAcces
 	}
 	else {
 		BTreeNode n = diskRead(node.offsetOfChildren.get(i), accessFile);
-		//System.out.println("Node Recursion: " + n.values.get(i).toString());
 		return Search(n, treeObj, accessFile);
 	}
 }
