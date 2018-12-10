@@ -29,7 +29,7 @@ public class BTree implements Serializable{
 
 	public BTree(int degree, String gbkFile, int seqLength) throws IOException, ClassNotFoundException {
 		t = degree;
-		nodeSize = 10000;
+		nodeSize = (700 * t); //10000;
 		nextPosition = 0;
 		bFile = gbkFile.substring(1) + ".btree.data." + seqLength + "." + t; 
 		metaData = new RandomAccessFile("metadata.bin", "rw");
@@ -77,9 +77,17 @@ public class BTree implements Serializable{
 	}
 	
 	private void diskWrite(int pos, BTreeNode node) {
-
+		
 		byte[] b = serialize(node); 
 		
+		if (pos == nextPosition - nodeSize) {
+			System.out.println("New node: " + b.length + " Number of values: " + node.values.size() + " Number of children: " + node.offsetOfChildren.size()); 
+		} 
+
+		if (b.length > nodeSize) {
+			System.out.println("Big node: " + b.length + " expected max: " + nodeSize + "number of values: " + node.values.size() + " Number of children: " + node.offsetOfChildren.size()); 
+		}
+
 		try {
 		bTreeOut.seek(pos);
 		bTreeOut.write(b);
@@ -137,11 +145,12 @@ public class BTree implements Serializable{
 		// create new right node and get reference to the node to be split 
 		BTreeNode rightNode = new BTreeNode(true, t, nextPosition);
 		nextPosition += nodeSize;
-
+ 		//System.out.println("SPLIT!");
 		BTreeNode leftNode = diskRead(parent.offsetOfChildren.get(i)); 
 		rightNode.leaf = leftNode.leaf; 
 		
 		while(leftNode.values.size() > t) {
+		//	System.out.println(leftNode.values.size()); 
 			rightNode.values.add(0,leftNode.values.remove(leftNode.values.size()-1));
 		}
 		// Move children from the left node to the right node if necessary 
